@@ -25,7 +25,7 @@ test_data = pd.read_csv(file_path + file_name_test_tata, names=column_names)
 
 # Data description 
 
-Overview and the description of the variables in the dataset. Will be updated continously...
+Overview and description of the variables in the dataset. Will be updated continously...
     
 
 | Column name | Column values| Description |
@@ -33,23 +33,23 @@ Overview and the description of the variables in the dataset. Will be updated co
 | duration | - | Duration of the connection in seconds |
 | protocol_type | categorical, 3 types | Type of protocol ([TCP](#tcp---transmission-control-protocol), [UDP](#udp---user-datagram-protocol), [ICMP](#icmp---internet-control-message-protocol)) |
 | service |  categorical, 70 different services | Network service on the destination (http, ftp, smtp)  |
-| flag |  categorical, 11 different flags | Status of the connection (SF, S0, REJ)  |
+| flag |  categorical, 11 different flags | Status of connection</br>('SF', 'S0', 'REJ', 'RSTR', 'SH', 'RSTO', 'S1', 'RSTOS0', 'S3', 'S2', 'OTH')  |
 | src_bytes |  - | Bytes sent from source to destination |
 | dst_bytes |  - | Bytes sent from destination to source |
 | land | bool | 1: connection to/from same host <br/>0: otherwise |
-| wrong_fragment |  - | Nr of wrong fragments |
-| urgent |  - | Nr of urgent packets |
-| hot |  - | Nr of hot indicatiors |
-| num_failed_logins |  - | Nr of failed login attempts |
+| wrong_fragment |  0, 1, 3 | Nr of wrong fragments |
+| urgent | 0-3 | Nr of urgent packets |
+| hot | 0-77 | Nr of hot indicatiors |
+| num_failed_logins |  0-5 | Nr of failed login attempts |
 | logged_in |  bool  | 1: successfully logged in <br/>0: otherwise|
 | num_compromised |  - | Nr of compromised conditions |
 | root_shell |  bool | 1: root shell obtained <br/>0: otherwise |
-| su_attempt |  bool | 1: 'su root' command attempt <br/>0: otherwise |
+| su_attempted |  0, 1, 2 | 'su root' command attempt |
 | num_root |  - | Nr of root accesses |
 | num_file_creations |  - | Nr of file creation operations |
-| num_shells |  - | Nr of shell prompts invoked |
-| num_access_files |  - | Nr of access file control operations |
-| num_outbound_cmds |  - | Nr of outbound commands |
+| num_shells |  0,1,2 | Nr of shell prompts invoked |
+| num_access_files |  0-9 | Nr of access file control operations |
+| num_outbound_cmds |  always 0 | Nr of outbound commands |
 | is_host_login |  bool | 1: login belongs to host </br>0: otherwise |
 | is_guest_login |  bool | 1: login from guest account <br/>0: otherwise |
 | count |  - | Nr of connections to **same host** as current connection in past 2s |
@@ -96,7 +96,7 @@ Some background knowledge and variables explained in more detail.
     1. Establish connection (via 3-way handshake)
         - **Synchronize**: Client sends a SYN packet to initiate a connection
         - **Synchronize-acknowledge**: Server responds with a SYN-ACK packet
-        - **Acknowledge**:Client sends ACK packet to finalize connction
+        - **Acknowledge**: Client sends ACK packet to finalize connction
     2. Transmit data
         - Data is divided into packets and transmitted in sequence
         - Receiver acknowledges received packets
