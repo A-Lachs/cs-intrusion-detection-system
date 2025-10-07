@@ -67,6 +67,7 @@ def print_classification_report(y_true, y_pred):
     #print(f"F1_Score: {round(f1_score,0)}") 
     return cr
 
+
 def plot_confusion_matrix(y_test:list, y_pred:list, classes=None, normalize='true', verbose=1):
     """
     Plot a confusion matrix with group counts, normalized percentages, and class labels.
