@@ -329,8 +329,8 @@ def create_test_input(input_file, output_X:str, output_y:str, nr_lines:int) :
 
     if nr_lines < len(data_df):
     
-        df_X.head(nr_lines).to_csv(f"../{output_X}_{nr_lines}", index=False, header=False, sep=",")
-        df_y.head(nr_lines).to_csv(f"../{output_y}_{nr_lines}", index=False, header=False, sep=",")
+        df_X.head(nr_lines).to_csv(f"../{output_X}_{nr_lines}.txt", index=False, header=False, sep=",")
+        df_y.head(nr_lines).to_csv(f"../{output_y}_{nr_lines}.txt", index=False, header=False, sep=",")
         print(f"Created files '{output_X}_{nr_lines}' and '{output_y}_{nr_lines}'.")
         return
     else:
