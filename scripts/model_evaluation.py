@@ -15,7 +15,7 @@ def baseline_model_genuine(data):
     """ 
     Baseline model 1a. 
     Always predict 'genuine' = 0 network traffic.
-    No need to worry. 
+    Don't worry. Be happy. 
     """
     return np.zeros(data.shape[0])
 
@@ -23,7 +23,7 @@ def baseline_model_malicious(data):
     """ 
     Baseline model 1b. 
     Always predict 'malicious' = 1 network traffic.
-    Catch them all. 
+    Gotta catch them all. 
     """
     return np.ones(data.shape[0])
 
