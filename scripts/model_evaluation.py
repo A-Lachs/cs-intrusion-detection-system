@@ -13,11 +13,19 @@ from sklearn.metrics import confusion_matrix, classification_report
 
 def baseline_model_genuine(data):
     """ 
-    Baseline model 1. 
+    Baseline model 1a. 
     Always predict 'genuine' = 0 network traffic.
+    No need to worry. 
     """
     return np.zeros(data.shape[0])
 
+def baseline_model_malicious(data):
+    """ 
+    Baseline model 1b. 
+    Always predict 'malicious' = 1 network traffic.
+    Catch them all. 
+    """
+    return np.ones(data.shape[0])
 
 def baseline_model_random(data):
     """ 

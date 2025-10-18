@@ -35,7 +35,13 @@ numerical_features = ['srv_serror_rate',
     'rerror_rate',
     'count']
 filename = "KDDTest+.txt"
-MODELS = {"RF": 'model/random_forest_model.pkl'} # Models avaiable for prediction (saved as pkl files)
+# Models avaiable for prediction (saved as pkl files, or as functions when starting with BM)
+MODELS = {
+     "RF": 'model/random_forest_model.pkl',
+     "BM_mal": 'baseline_model_malicious',
+     "BM_rand": 'baseline_model_random',
+     "BM_protocol": 'baseline_model_risky_protocol',
+     } 
 # path = "d:/PYTHON/CS_Bootcamp/programs/cs-intrusion-detection-system/data/KDDTest+.txt"
 # TODO: add baseline models for prediction 
 
@@ -80,6 +86,9 @@ def run_prediction():
     
     return y_prediction
 
+
+
+
 # ------------------------------------ main program -------------------------------------
 
 if __name__ == "__main__":
@@ -87,29 +96,33 @@ if __name__ == "__main__":
     arguments = sys.argv # process CLI arguments
 
     # check if the first argument is a model from the dict MODELS
+    # TODO: create a function that preprocesses the 2nd input argument
+
     if arguments[1] in MODELS.keys():
         
         # load the model 
         print("\n--------------------")
         print(f"- Load model: {arguments[1]}") 
-        loaded_model = pickle.load(open(MODELS[arguments[1]], 'rb'))
+        if arguments[1] == 'RF':
+            loaded_model = pickle.load(open(MODELS[arguments[1]], 'rb'))
 
-        # check input nr of input arguments 
-        if len(arguments) == 3:
-            print('- Mode: prediction without evaluation.') #--> no y values given 
-            predictions = run_prediction()
+                # check nr of input arguments 
+            if len(arguments) == 3:
+                print('- Mode: prediction without evaluation.') #--> no y values given 
+                predictions = run_prediction()
 
-        elif len(arguments) == 4: # (optional)
-            print('- Mode: prediction with evaluation') # X an y were given 
-            predictions = run_prediction() 
-
-            # TODO: preprocess target variable 
-
+            elif len(arguments) == 4: # (optional)
+                print('- Mode: prediction with evaluation') # X an y were given 
+                predictions = run_prediction() 
+                print('- Error: evaluation not implemented yet.')
+                # TODO: preprocess target variable 
+            else:
+                print(f'- Error: Wrong number of input arguments. Got {len(sys.argv)}, expected 3 or 4.')
         else:
-            print(f' Wrong number of input arguments, got {len(sys.argv)}, expected 3 or 4.')
-
+            print('- Error: This model is not implemented yet. Valid option: "RF".')
+            
     else:
-        print(f"- Unknown model. Expects one of {MODELS.keys} as second argument.")
+        print(f"- Error: Unknown model. Expects one of {list(MODELS.keys())} as second argument.")
 
     # CLI input: 
     # python predict.py RF test_input_X_20.txt
