@@ -11,9 +11,14 @@ from preprocessing import *
 from file_handling import *
 from model_evaluation import *
 
-# ------------------------------------------ Variables ------------------------------
 
-# there is no preprocessing for numerical features yet, so they are added here 
+# ------------------------------------------ variables ---------------------------------
+
+
+# Note: there is no preprocessing for some numerical features, so they are added here for now
+# atm only forest based (or baseline) models are available, where further preprocessing is not necessary
+# based on eda results some numerical features are transformed to categories in the preprocessing step 
+
 numerical_features = ['srv_serror_rate',
     'same_srv_rate',
     'dst_host_same_srv_rate',
@@ -36,7 +41,7 @@ numerical_features = ['srv_serror_rate',
     'dst_host_rerror_rate',
     'rerror_rate',
     'count']
-filename = "KDDTest+.txt"
+
 # Models avaiable for prediction (saved as pkl files, or as functions when starting with BM)
 MODELS = {
      "RF": 'model/random_forest_model.pkl',
@@ -45,10 +50,11 @@ MODELS = {
      "BM_protocol": baseline_model_risky_protocol,
      } 
 
-# path = "d:/PYTHON/CS_Bootcamp/programs/cs-intrusion-detection-system/data/KDDTest+.txt"
-# ---------------------------------------------------------------------------------------
 
-def run_prediction():
+# --------------------------------------- main functions -------------------------------
+
+
+def run_prediction_process():
     """
     Wrapper function for the whole 5 step prediction process. 
 
@@ -64,8 +70,8 @@ def run_prediction():
     # ------------------------------------------------------------
     # Step 1: Read data
     # try to read 3rd CLI arg as path to data (X_test)
-    file_path = arguments[2].strip()
-    df_data= read_data_to_df(file_path) 
+    file_path_X = arguments[2].strip()
+    df_data = read_data_to_df(file_path_X) 
     
     if df_data is None:
         print("--> Terminating process: Data could not be loaded.")
@@ -97,7 +103,7 @@ def run_prediction():
         print("---------------"*2)
         print("+++ Data preprocessing ...")
         categorial_features = preprocessing_categories(df_data)
-        # ------------------------------------------------------------
+        
         # select features (must be the same the model was trained on)
         df_preprocessed = df_data[ numerical_features + categorial_features]
         # ------------------------------------------------------------
@@ -115,33 +121,59 @@ def run_prediction():
     
     return y_prediction
 
-# ------------------------------------ main program -------------------------------------
+
+def run_evaluation_process():
+    """
+    Wrapper function for the 3 step evaluation process. 
+
+    Step 1: Read y data 
+    Step 2: Preprocessing
+    Step 3: Evaluation
+    """ 
+    # ------------------------------------------------------------
+    # 1. Step: read 4th CLI arg as path to y_true data
+    file_path_y = arguments[3].strip()
+    df_y = read_single_column_data(file_path_y)
+    
+    if df_y is None:
+        print("--> Terminating process: Evaluation data could not be loaded.")
+        return
+    # ------------------------------------------------------------
+    # step 2. preprocess y data
+    print("---------------"*2)
+    print("+++ Data preprocessing ...")
+    # TODO: control edge cases 
+    df_target = recode_binary_target_feature(df_y, "attack_type", "target")
+    # ------------------------------------------------------------
+    # Step 3: evaluation
+    print("---------------"*2) 
+    print("+++ Evaluating predictions ...")
+    evaluation_report = print_classification_report(df_target["target"], y_prediction)
+    # TODO: add short report with relevant metrics 
+    return evaluation_report
+
+
+# ------------------------------------ main program -------------------------------------------
+
 
 if __name__ == "__main__":
 
+    arguments = sys.argv 
+    # process CLI arguments
+    # # arguments[1] --> model specification
+    # # arguments[2] --> path to X values for which you want to make a prediciton
+    # # arguments[3] --> path to y values which are the true values matching your X values
 
-    arguments = sys.argv # process CLI arguments
+    # check nr of input arguments
+    if len(arguments) == 3 or len(arguments) == 4:
+    
+        y_prediction = run_prediction_process()
 
+        # proceed with evaluation when predictions were successfully made and y data (true values) are given
+        if y_prediction is not None and len(arguments) == 4:
+            evaluation = run_evaluation_process()
+            #print(evaluation)
 
-    # check nr of input arguments 
-    if len(arguments) == 3:
-        print('- Mode: prediction without evaluation.') #--> no y values given 
-        predictions = run_prediction()
-
-    elif len(arguments) == 4: # (optional)
-        print('- Mode: prediction with evaluation') # X an y were given 
-        predictions = run_prediction() 
-        print('- Error: evaluation not implemented yet.')
-        # TODO: preprocess target variable 
-        # TODO: run evaluation func
-                        
     else:
         print(f'--> Error: Wrong number of input arguments. Got {len(sys.argv)}, expected 3 or 4.')
             
-
-
-
-
-
-    # CLI input: 
-    # python predict.py RF test_input_X_20.txt

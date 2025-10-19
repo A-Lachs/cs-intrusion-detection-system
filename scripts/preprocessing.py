@@ -149,14 +149,31 @@ def is_categorical_dtype(data_df, feature):
     return isinstance(data_df[feature].dtype, pd.CategoricalDtype) 
     
 
-def recode_binary_target_feature(df_data: pd.DataFrame, input_feature: str, output_feature_name: str):
-
+def recode_binary_target_feature(df_y: pd.DataFrame, input_feature: str, output_feature_name: str):
+    # TODO: add option to change the "genuine" category name
+    # TODO: check if it is a binary target var already if it is only 0 and 1 fine, if not do the preprocessing;
+    # TODO: len y must match X 
+    
+    categories = list(df_y['attack_type'].unique())
+    #print(categories)
+    if len(categories) != 2:
+        #print(f" - Expected 2 categories, got {len(categories)}")
+        # check if 0 and 1 are the categories
+        if "0" in categories and "1" in categories:
+            pass
+            #print("Good!")
+        else:
+            pass
+            # print("Not Good")
+        
     # add a binary target variable (attack 1, no attack 0) to df_data, based on input feature 
-    df_data[output_feature_name]= [0 if x == "normal" else 1 for x in df_data[input_feature]] 
+    df_y[output_feature_name]= [0 if x == "normal" else 1 for x in df_y[input_feature]] 
 
     # convert to category
-    df_data = convert_column_type(df_data, output_feature_name, 'category')
-    return
+    df_y = convert_column_type(df_y, output_feature_name, 'int')
+    df_y = convert_column_type(df_y, output_feature_name, 'category')
+    
+    return df_y
      
 
 def recode_to_binary_feature(data_df: pd.DataFrame, 

@@ -1,3 +1,7 @@
+########################################################################
+### collection of functions used for model classification evaluation ###
+########################################################################
+
 import pandas as pd
 import numpy as np
 import random
@@ -5,11 +9,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
 
-# functions
-
 # ------------------------------------- models ------------------------------------------
 
-# define simple baseline models 1-3 for model comparison 
+# define simple baseline models for model perfromance comparison 
 
 def baseline_model_genuine(data):
     """ 
@@ -34,7 +36,6 @@ def baseline_model_random(data):
     """
     return [random.randint(0 ,1) for _ in range(data.shape[0])]
 
-
 def baseline_model_risky_protocol(data):
     """ 
     Baseline model 3.
@@ -42,7 +43,6 @@ def baseline_model_risky_protocol(data):
     EDA revealed that over 80% of traffic with 'icmp protocol type was malicious.
     """
     return [1 if protocol == 'icmp' else 0 for protocol in data["protocol_type"]]
-
 
 # ------------------------------------- prediction -------------------------------------
 
@@ -62,26 +62,26 @@ def make_predictions(model, Xtrain, Xtest):
 
 # ------------------------------------- evaluation -------------------------------------
 
-def print_classification_report(y_true, y_pred): 
-    # quick and dirty evaluation output for now 
-    # prevent classification report warning with adding 'zero_division=0', 
-    # in case model does not predict one class -> 0 instead of NaN
+
+def print_classification_report(y_true, y_pred) -> dict:
+    """
+    Print and return a classification report.
+    Note: in case one class is not predicted, prevent zero division warning
+    by adding the parameter 'zero_division=0'. 
+    """
     print("------"*10)
-    print("Classification Report: \n", 
-          classification_report(y_true, y_pred))
+    cr = classification_report(y_true, y_pred, zero_division=0)
+    print("Classification Report:\n", cr)
     print("------"*10)
-    cr = classification_report(y_true, y_pred, output_dict=True, zero_division=0)
-    #f1_score = cr['macro avg']['f1-score'] * 100
-    #print(f"F1_Score: {round(f1_score,0)}") 
-    return cr
+    return classification_report(y_true, y_pred, output_dict=True, zero_division=0)
 
 
-def plot_confusion_matrix(y_test:list, y_pred:list, classes=None, normalize='true', verbose=1):
+def plot_confusion_matrix(y_true:list, y_pred:list, classes=None, normalize='true', verbose=1):
     """
     Plot a confusion matrix with group counts, normalized percentages, and class labels.
 
     Args:
-        y_test (list):     True class labels
+        y_true (list):     True class labels
         y_pred (list):     Predicted class labels
         classes (list of str):      optional Names of classes in the order ["0", ""1" ...]
         normalize (str or None):    optional Normalization mode ('true', 'pred', 'all', or None)
@@ -90,8 +90,8 @@ def plot_confusion_matrix(y_test:list, y_pred:list, classes=None, normalize='tru
     """
 
     # compute confusion matrix
-    cf_matrix = confusion_matrix(y_test, y_pred)
-    cf_matrix_norm = confusion_matrix(y_test, y_pred, normalize=normalize)
+    cf_matrix = confusion_matrix(y_true, y_pred)
+    cf_matrix_norm = confusion_matrix(y_true, y_pred, normalize=normalize)
 
     # create labels (group names + count + percentage)
     group_names = ["TN", "FP", "FN", "TP" ] 

@@ -1,4 +1,6 @@
-### python script to collect functionality for input and output file handling
+#######################################################################
+### collection of functions used for input and output file handling ###
+#######################################################################
 
 import pandas as pd
 import os
@@ -86,7 +88,7 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
                "dst_host_srv_rerror_rate", "attack_type", "difficulty_level"]
     
     print("---------------"*2) 
-    print("+++ Reading data ...")
+    print("+++ Reading X data ...")
 
     # Check path
     # print(f"[DEBUG] Checking path: {os.path.abspath(path_to_file)}")
@@ -110,8 +112,11 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
     else:
         print(f"--> Error: Unexpected number of columns: {num_cols}, has to be 43 or 42.")
         return None
+    
+    df_X = pd.read_csv(path_to_file,  names=column_names)
+    print(f"--> Loaded {len(df_X)} values from '{path_to_file}'.")
 
-    return pd.read_csv(path_to_file,  names=column_names)
+    return df_X
     
 
 def read_single_column_data(path_to_file: str) -> pd.DataFrame | None:
@@ -124,6 +129,8 @@ def read_single_column_data(path_to_file: str) -> pd.DataFrame | None:
     Returns:
         pd.DataFrame with one column, or None if something goes wrong.
     """
+    print("---------------"*2) 
+    print("+++ Reading y data ...")
 
     if not os.path.exists(path_to_file):
         print(f"--> Error: Cannot find file: '{path_to_file}'.")
