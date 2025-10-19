@@ -8,11 +8,11 @@ sys.path.insert(0, project_path + '\scripts')
 sys.path.insert(0, project_path + '\model')
 
 from preprocessing import *
+from file_handling import *
 from model_evaluation import *
 
 # ------------------------------------------ Variables ------------------------------
 
-output_file_name = 'prediction.txt'
 # there is no preprocessing for numerical features yet, so they are added here 
 numerical_features = ['srv_serror_rate',
     'same_srv_rate',
@@ -44,42 +44,9 @@ MODELS = {
      "BM_rand": baseline_model_random,
      "BM_protocol": baseline_model_risky_protocol,
      } 
+
 # path = "d:/PYTHON/CS_Bootcamp/programs/cs-intrusion-detection-system/data/KDDTest+.txt"
 # ---------------------------------------------------------------------------------------
-
-def normalize_str(s:str)-> str:
-     return s.strip().lower()
-
-
-def find_model(input_arg:str, models:dict) -> tuple | None:
-    """
-    If the input_arg is a key in the dict models 
-    return its key and value, otherwise None. 
-
-    - input_arg and dict key are normalized with the helper function normalize_str()
-
-    Args:
-        input_arg (str): model name
-        models (dict):   where the keys are the model names and values the models
-
-    Returns:
-        tuple | None:   key and value of the model dict or None
-    """
-
-    for key, value in models.items():
-        if normalize_str(key) == normalize_str(input_arg):
-            return key, value
-
-    return
-
-
-def write_prediction_output(output_file, predictions):
-    # write predictions to a text file with one line per prediction
-    with open(output_file, "w", encoding="utf-8", newline="") as f: 
-            
-            for prediction in predictions: 
-                    f.write(str(prediction) + "\n")
-
 
 def run_prediction():
     """
@@ -95,40 +62,55 @@ def run_prediction():
     and models loaded from a pickle file. 
     """ 
     # ------------------------------------------------------------
-    # Step 1: Read data 
-    # read 3nd argument as path to X_test data 
-    filepath = arguments[2]
-    df_test = read_data_to_df(filepath) 
-    # ------------------------------------------------------------
+    # Step 1: Read data
+    # try to read 3rd CLI arg as path to data (X_test)
+    file_path = arguments[2].strip()
+    df_data= read_data_to_df(file_path) 
     
-    if model[0].startswith('BM'):
-        # Step 2: Load model
+    if df_data is None:
+        print("--> Terminating process: Data could not be loaded.")
+        return
+    # ------------------------------------------------------------
+    # Step 2: Load model 
+    # check if the 2nd argument is a model from the dict MODELS
+    model = find_model(arguments[1], MODELS)
+    
+    if model is None:
+        print("--> Terminating process: Model could not be loaded.")
+        return
+
+    # following steps differ, depending on model choice
+
+    if model[0].startswith('BM'): 
         # use baseline model function
         # ------------------------------------------------------------
         # Step 4: Prediction
-        print("- Predicting ... ")
-        y_prediction =  model[1](df_test)
+        print("---------------"*2) 
+        print("+++ Predicting ...")
+        y_prediction =  model[1](df_data)
         # ------------------------------------------------------------
-    else:
-        # Step 2: Load model
+    else: 
         # load model from pickle file 
         loaded_model = pickle.load(open(model[1], 'rb'))
         # ------------------------------------------------------------
         # step 3: Preprocessing / feature engineering
-        print("- Data preprocessing ...")
-        categorial_features = preprocessing_categories(df_test)
+        print("---------------"*2)
+        print("+++ Data preprocessing ...")
+        categorial_features = preprocessing_categories(df_data)
         # ------------------------------------------------------------
         # select features (must be the same the model was trained on)
-        df_X = df_test[ numerical_features + categorial_features]
+        df_preprocessed = df_data[ numerical_features + categorial_features]
         # ------------------------------------------------------------
-        # Step 4: Prediction 
-        print("- Predicting ... ")
-        y_prediction = loaded_model.predict(df_X)
+        # Step 4: Prediction
+        print("---------------"*2) 
+        print("+++ Predicting ...")
+        y_prediction = loaded_model.predict(df_preprocessed)
 
     # ------------------------------------------------------------
-    # Step 5: Write output file
-    print(f"- Writing results to {output_file_name} ")
-    write_prediction_output(output_file_name, y_prediction)
+    # Step 5: Write to output file
+    print("---------------"*2)
+    # output file name is defined in scripts/file_handling.py
+    write_prediction_output(y_prediction)
     # ------------------------------------------------------------
     
     return y_prediction
@@ -137,34 +119,26 @@ def run_prediction():
 
 if __name__ == "__main__":
 
+
     arguments = sys.argv # process CLI arguments
 
-    # check if the 2nd argument is a model from the dict MODELS
-    model = find_model(arguments[1], MODELS)
 
-    if model:    
-        print("\n--------------------")
-        print(f"- Load model: {model[0]}") 
+    # check nr of input arguments 
+    if len(arguments) == 3:
+        print('- Mode: prediction without evaluation.') #--> no y values given 
+        predictions = run_prediction()
 
-        # TODO: implement func to check inpurt arg 3 and 4 
-       
-        # check nr of input arguments 
-        if len(arguments) == 3:
-            print('- Mode: prediction without evaluation.') #--> no y values given 
-            predictions = run_prediction()
-
-        elif len(arguments) == 4: # (optional)
-            print('- Mode: prediction with evaluation') # X an y were given 
-            predictions = run_prediction() 
-            print('- Error: evaluation not implemented yet.')
-            # TODO: preprocess target variable 
-            # TODO: run evaluation func
-                            
-        else:
-            print(f'- Error: Wrong number of input arguments. Got {len(sys.argv)}, expected 3 or 4.')
-            
+    elif len(arguments) == 4: # (optional)
+        print('- Mode: prediction with evaluation') # X an y were given 
+        predictions = run_prediction() 
+        print('- Error: evaluation not implemented yet.')
+        # TODO: preprocess target variable 
+        # TODO: run evaluation func
+                        
     else:
-        print(f"- Error: Unknown model. Expects one of {list(MODELS.keys())} as second argument.")
+        print(f'--> Error: Wrong number of input arguments. Got {len(sys.argv)}, expected 3 or 4.')
+            
+
 
 
 
