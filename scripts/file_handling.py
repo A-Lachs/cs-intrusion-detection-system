@@ -46,6 +46,20 @@ def find_model(input_arg:str, models:dict) -> tuple | None:
     return
 
 
+def path_ok(file_path: str) -> bool:
+    """
+    Check whether the given file path exists.
+    Args:
+        file_path (str): Path to a file.
+    Returns:
+        bool: True if file exists, False otherwise.
+    """
+    if not os.path.exists(file_path):
+        print(f"--> Error: Cannot find path: '{file_path}'.")
+        return False
+    return True
+
+
 def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
     """
     Read data from .txt or .csv file and return a pandas DF
@@ -79,13 +93,13 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
     # print(f"[DEBUG] Exists? {os.path.exists(path_to_file)}")
 
     if not os.path.exists(path_to_file):
-        print(f"--> Error: Cannot find path: '{path_to_file}'.")
-        return 
-    
+        print(f"--> Error: Cannot find file: '{path_to_file}'.")
+        return None
+
     # count the nr of columns from txt file
     with open(path_to_file, 'r') as f:
         first_line = f.readline().strip()
- 
+
     num_cols = len(first_line.split(","))
 
     # depending on the number of columns, adapt column_names
@@ -95,10 +109,74 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
         column_names = [c for c in col_names_full if c != "attack_type"] # remove target
     else:
         print(f"--> Error: Unexpected number of columns: {num_cols}, has to be 43 or 42.")
-        return
+        return None
 
     return pd.read_csv(path_to_file,  names=column_names)
+    
 
+def read_single_column_data(path_to_file: str) -> pd.DataFrame | None:
+    """
+    Reads a text or csv file expecting 1 column (1 str per line).
+    Accepts:
+      - Case 1: column format (1 str per line)
+      - Case 2: single line format (with strings seperated by comma, semicolor or space)
+    
+    Returns:
+        pd.DataFrame with one column, or None if something goes wrong.
+    """
+
+    if not os.path.exists(path_to_file):
+        print(f"--> Error: Cannot find file: '{path_to_file}'.")
+        return None
+
+    with open(path_to_file, "r", encoding="utf-8") as f:
+        lines = [line.strip() for line in f if line.strip()]
+
+    if not lines:
+        print(f"--> Error: File '{path_to_file}' is empty.")
+        return None
+
+    # Case 1: column format  (1 str per line)
+    if len(lines) > 1:
+        data = lines
+    else:
+        # Case 2: single line format (split it by del)
+        line = lines[0]
+        if "," in line:
+            data = line.split(",")
+        elif ";" in line:
+            data = line.split(";")
+        elif " " in line:
+            data = line.split()
+        else:
+            data = [line]  # just 1 element
+
+    # Remove empty str and spaces
+    data = [item.strip() for item in data if item.strip()]
+
+    df = pd.DataFrame(data, columns=["attack_type"])
+    print(f"--> Loaded {len(df)} values from '{path_to_file}'.")
+    return df
+
+
+def read_y_data(path_to_y_data):
+
+    if path_ok(path_to_y_data):
+        # read y data as df (expecting name of attacks vs normal. ) 
+
+        # check input format 
+        # count the nr of columns from txt file -> expect 1
+        with open(path_to_y_data, 'r') as f:
+            first_line = f.readline().strip()
+    
+        num_cols = len(first_line.split(","))
+        if num_cols ==1:
+            df_y = pd.read_csv(path_to_y_data,  names="attack_type")
+            return df_y
+        else:
+            print("--> Error: Expected 1 column")
+   
+    return
 
 # ------------------------------- create test input  -----------------------------------------
 
