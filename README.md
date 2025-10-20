@@ -38,39 +38,78 @@ pip install -r requirements.txt --upgrade
 * Hint: use `--upgrade` to install packages listed in requirements.txt or update existing to pinned versions
 * Add the '.env' file to the '.gitignore' file
 
-## 2. Run the program 
-- There are 2 different modes (theoretically - currently only mode 1 is implemented:)
-    -   Mode 1: prediciton (required arguments --> model name, X-values)
-    -   Mode 2: prediction and evaluation (required arguments --> model, X-values and corresponding y-values)
+## 2.  Select parameters and input 
+
+There are 2 different modes (triggered by the amount of CLI arguments).
+-   **Mode 1: Prediciton** 
+    -   Required CLI arguments: 
+        -   model name
+        -   X-values (path to txt or csv file)
+    -   Output: 
+        - file 'prediction.txt' with a prediction (0 or 1) for each line of X-values
+
+-   **Mode 2: Prediction and evaluation**
+    -   Required CLI arguments: 
+        -   model name 
+        -   X-values (path to txt or csv file)
+        -   corresponding y-values (path to txt or csv file)
+    -   Output: 
+        -   file 'prediction.txt' with a prediction (0 or 1) for each line of X-values
+        -   evaluation: prints full classification report (for now)  
+
 - Available models:
-    - `'RF'` --> Trained random forest classifier model
-    - `'BM_mal'` --> Baseline model, always predict malicious network traffic
-    - `'BM_rand'` --> Baseline model, randomly predict genuine or malicius network traffic
+    - `'RF'` --> Trained Random Forest Classifier
+    - `'BM_mal'` --> Baseline Model, always predict malicious network traffic (1)
+    - `'BM_rand'` --> Baseline Model, randomly predict genuine or malicius network traffic 
     - `'BM_protocol'` --> Baseline model, predict malicious network traffic when imcp is used
 
 - Input specifications:
-    - The input has to have the same format as the on the model was trained on. 
-    - The `test_input_X_20.txt` and `test_input_X_1.txt` are examples that were created from the test_data set from kaggle. 
-    - Optionally, run `preprocessing.py` and specify the number of lines in the `create_test_input()` function to create larger input test files.
+    - ` X-values`
+        -   This input has to have the same format as the model was trained on (same number and names of features). 
+        -   The files `test_input_X_20.txt` (20 lines) and `test_input_X_1.txt`(one line) contain example cases that were created from the test_data set from kaggle (one case per line). 
+        -   These can be used to test predictions about genuine or malicious network traffic.  
+        - Optionally, run [...] and specify the number of cases (lines) in the `create_test_input()` function to create larger input test files from the kaggle test data set. 
+            - Note: This functionality is currently migrated and not working.
 
-- Run the prediction from CLI with 'python predict.py model_name path_to_X_values'
-    - where the model name is one of the available models mentioned above.
-    - For example: `python predict.py RF test_input_X_20.txt`
+    - `y-values`
+        - This input is required when you know the true classification of the cases for which a prediction is made and you want to evaluate the model performance. 
+        - The number of X-values and y-values has to match, e.g. use `test_input_X_20.txt` with `test_input_y_20.txt`.     
 
-- Result: This creates an output file 'prediction.txt.' where the prediction for each row in the input file is written in a new line: either 0 (genuine) or 1 (malicious) network traffic.
+## 3. Run the program from CLI  
+-   with `python predict.py model_name path_to_X_values path_to_y_values`
+
+    -   where the `model_name` is one of `RF`, `BM_mal`, `BM_rand` or `BM_protocol`
+    -   and the `path_to_X_values` and `path_to_y_values` can be specified as the test files provided `test_input_X_20.txt` and `test_input_y_20.txt`
+
+- **Example for Mode 1: prediction** 
+    -    predict whether network traffic of one example case is genuine or malicious with the random baseline model
+    - `python predict.py BM_rand test_input_X_1.txt`
+- **Example for mode 2: prediction and evaluation** 
+    -   redict whether network traffic of 20 example casesis genuine or malicious  with the Random Forest Classifier
+    -   `python predict.py RF test_input_X_1.txt test_input_y_1.txt`
+
+## 4. Interpret the results
+
+- Each prediction procress creates an output file `prediction.txt` where the prediction for each case (line) in the input file is written in a new line: either 0  for genuine or 1 for malicious network traffic.
+- For model evaluation a classification report is printed, compare accuracy, precision and recall values
 
 
 # Future improvements
-- Add the Mode 2 functionality in `predict.py` (model evaluation, when true y-values are given)
-- use kaggle API to get the data
-- use seperate script to create test input
+- improve evaluation output and description 
+- improve automation: 
+    -   use kaggle API to get the data
+    -   use seperate script to create test input
 - eda: 
-    - Document eda (summary)
+    - Create eda summary (md file)
     - Clean the eda notebook and export the functions to the scripts folder for a better overview
 - models:
-    - Document model evaluation and comparison (model notebook)
+    - Create summary for model evaluation and comparison (md file)
     - Clean the model notebook
-    - Train and compare more models for binary classification (e.g., XGboost)
+    - add own precrocessing func to pipeline
+    - Train and compare more models for binary classification (e.g., XGBoost)
 
-# Disclaimer
-This is a WIP, I am still learning (October 2025)
+----
+----
+Disclaimer: 
+This is a WIP, I am still learning
+(repo started october 2025)
