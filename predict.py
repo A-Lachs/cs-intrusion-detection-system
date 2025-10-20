@@ -144,6 +144,11 @@ def run_evaluation_process():
     print("+++ Data preprocessing ...")
     # TODO: control edge cases 
     df_target = recode_binary_target_feature(df_y, "attack_type", "target")
+
+    if len(df_y) != len(y_prediction):
+        print("--> Error: length of X and y values do not match!")
+        print("--> Terminating evaluation process.")
+        return
     # ------------------------------------------------------------
     # Step 3: evaluation
     print("---------------"*2) 
@@ -164,12 +169,15 @@ if __name__ == "__main__":
     # # arguments[2] --> path to X values for which you want to make a prediciton
     # # arguments[3] --> path to y values which are the true values matching your X values
 
-    # check nr of input arguments
+    # Proceed with processing depening on nr of CLI arguments
     if len(arguments) == 3 or len(arguments) == 4:
-    
+        
+        # Mode 1: Prediction - for 3 and 4 arguments 
         y_prediction = run_prediction_process()
 
-        # proceed with evaluation when predictions were successfully made and y data (true values) are given
+        # Mode 2: Evaluation - for 4 arguments
+        # proceed when predictions were successfully made 
+        # and y data (true values) are given
         if y_prediction is not None and len(arguments) == 4:
             evaluation = run_evaluation_process()
             #print(evaluation)

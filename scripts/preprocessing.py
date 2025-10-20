@@ -4,7 +4,6 @@
 
 import pandas as pd
 import numpy as np
-import os
 import sys
 
 project_path = "d:\\PYTHON\\CS_Bootcamp\\programs\\cs-intrusion-detection-system"
@@ -94,8 +93,9 @@ def preprocessing_categories(data_df):
     for feature in RECODE_NUM_TO_BINARY_CAT:
         new_feature = feature + "_cat"
         # note: do not use the threshold here, it was used in the training data to define the categories.
-        # from EDA: assume 0 is the most frequent values and recode all other values to 1 
-        data_df[new_feature] = [x if x == 0 else 1 for x in data_df[feature]]
+        # from EDA: assume 0 is the most frequent value and recode all other values to 1   
+        data_df[new_feature] = (data_df[feature] != 0).astype(int) # fancy vectorized pd version (create bool mask and convert to int)
+        # data_df[new_feature] = [x if x == 0 else 1 for x in data_df[feature]] # same 
 
         # convert to categorical 
         data_df = convert_column_type(data_df, new_feature, 'category')
@@ -134,9 +134,9 @@ def convert_column_type(df_data: pd.DataFrame, columns: list | str, to_type) -> 
     Returns:
         pd.DataFrame:               Input df with converted columns.
     """
-    if isinstance(columns, str):
-        # convert co list
-        columns = [columns]
+    if isinstance(columns, str):    
+        columns = [columns]  # convert co list
+    
     for col in columns:
         df_data[col] = df_data[col].astype(to_type)
 
@@ -149,32 +149,57 @@ def is_categorical_dtype(data_df, feature):
     return isinstance(data_df[feature].dtype, pd.CategoricalDtype) 
     
 
-def recode_binary_target_feature(df_y: pd.DataFrame, input_feature: str, output_feature_name: str):
-    # TODO: add option to change the "genuine" category name
-    # TODO: check if it is a binary target var already if it is only 0 and 1 fine, if not do the preprocessing;
-    # TODO: len y must match X 
-    
-    categories = list(df_y['attack_type'].unique())
-    #print(categories)
-    if len(categories) != 2:
-        #print(f" - Expected 2 categories, got {len(categories)}")
-        # check if 0 and 1 are the categories
-        if "0" in categories and "1" in categories:
-            pass
-            #print("Good!")
-        else:
-            pass
-            # print("Not Good")
-        
-    # add a binary target variable (attack 1, no attack 0) to df_data, based on input feature 
-    df_y[output_feature_name]= [0 if x == "normal" else 1 for x in df_y[input_feature]] 
+def recode_binary_target_feature(
+    df_y: pd.DataFrame,
+    input_feature: str,
+    output_feature_name: str,
+    normal_category_name: str = "normal"
+) -> pd.DataFrame:
+    """
+    Recode a categorical variable (input_feature) into a binary categorical target variable (0/ 1), 
+    where 0 stands for genuine and 1 for malicious network traffic. 
+    The input feature must contain one category (normal_category_name) that identifies the 'genuine' class. 
+    The normal_category_name (e.g., "normal") is mapped to 0, all other categories are mapped to 1.  
 
-    # convert to category
-    df_y = convert_column_type(df_y, output_feature_name, 'int')
-    df_y = convert_column_type(df_y, output_feature_name, 'category')
+    Also accepts cases where the input feature is already binary (either as integers 0/1 or strings "0"/"1").
+    In this case the normal_category_name is not used, only the conversion to int and category is done.
+
+    Args:
+        df_y (pd.DataFrame):        DF containing the input_feature column.
+        input_feature (str):        Name of input feature to recode.
+        output_feature_name (str):  Name of output feature to create.
+        name_normal_category        Category representing the "normal" or "non-attack" class,
+        (str, optional):            which will be mapped to 0. Defaults to "normal".
+      
+    Returns:
+        pd.DataFrame:   With binary categorical target column added.
+    """
+    
+    if input_feature not in df_y.columns:
+        print(f"--> Error: No column named {input_feature}.")
+        return None
+    
+    categories = list(df_y[input_feature].unique())
+
+    # Case 1: input feature is binary numeric
+    if set(categories).issubset({0, 1}):
+        df_y[output_feature_name] = df_y[input_feature].astype("category")
+
+    # Case 2: input feature is binary string
+    elif set(categories).issubset({"0", "1"}):
+        df_y[output_feature_name] = df_y[input_feature].astype(int).astype("category")
+        
+    # Case 3: input feature has category 'name_normal_category' mapped to 0
+    elif normal_category_name in categories:
+        # fancy vectorized version instead of list comprehension (create bool mask and convert to int)
+        df_y[output_feature_name] = (df_y[input_feature] != normal_category_name).astype(int).astype("category")
+        # df_y[output_feature_name] = [0 if x == name_normal_category else 1 for x in df_y[input_feature]]        
+    else:
+        print(f"--> Error: No category named {normal_category_name} in {categories}.")
+        return None
     
     return df_y
-     
+
 
 def recode_to_binary_feature(data_df: pd.DataFrame, 
                              input_feature: str, 
@@ -184,23 +209,28 @@ def recode_to_binary_feature(data_df: pd.DataFrame,
                              threshold=BINARY_FEATURE_THRESHOLD):
     """
     Recode a numerical feature to binary categorical feature based on threshold.
-    The input feature must have a value that occurs more frequently than the threshold.
+    The input feature must have a value that occurs more frequently than the threshold 
     If true, all other feature values occur only rarely and are summarized into another category
     with the name new_cat_name (default 1). 
+    
+    - Note: This function assumes that the most frequent value is 0, and the default "other" category is 1.
+            Returns None if the most freq value is not 0. 
+    
+    - Purpose: In the eda only the features that fullfill this criterion are selected for recoding.  
 
     Args:
-        data_df (pd.DataFrame):     DF that contaisn the numerical input feature.
+        data_df (pd.DataFrame):     DF that contains the numerical input feature.
         input_feature (str):        Numerical feature to recode
         output_feature_name (str):  Name of the new feature column.
-        verbose (0 or 1, optional): Allow additional print statements. Defaults to VERBOSE.
+        verbose (0 or 1, optional): Allow additional print statements.
         new_cat_name (optional):    Name of the new category of the binary feature. 
-                                    Here I used 1. A check needs to be added!
+                                    Defaults to 1. Assuming the other category is 0.
                                         Defaults to BINARY_FEATURE_NEW_CAT = 1
         threshold (float, optional):    Defaults to BINARY_FEATURE_THRESHOLD = 0.99.
     """
     
     feature_proportions = data_df[input_feature].value_counts(normalize=True).reset_index()
-    most_frequent_value = feature_proportions.head(1)[input_feature].values[0] # name of the first category
+    most_frequent_value = feature_proportions.head(1)[input_feature].values[0] # first category
     
     if threshold: # no threshold used for test data 
         # Sanity checks prior to recoding
@@ -216,10 +246,14 @@ def recode_to_binary_feature(data_df: pd.DataFrame,
     if verbose:
         print(f"Recoding {input_feature} to categories: {most_frequent_value} vs. {new_cat_name}.\n")
     
-    # recode to most freq value vs all "other", here new_cat_name (1)
-    # TODO: check that most_frequent_value is not 1 
-    data_df[output_feature_name] = [x if x == most_frequent_value else new_cat_name for x in data_df[input_feature]]
-
+    # recode to most freq value vs all "other"
+    # Here assume the most freq val is 0, all other will be 1 (new_cat_name)
+    if most_frequent_value == 0:
+        data_df[output_feature_name] = [x if x == most_frequent_value else new_cat_name for x in data_df[input_feature]]
+    else:
+        print(f"--> Attention: the most frequent value for '{input_feature}' is not 0 but {most_frequent_value}.\nCheck recoding categories.")
+        return
+    
     # convert to categorical 
     data_df = convert_column_type(data_df, output_feature_name, 'category') 
     return
@@ -239,7 +273,7 @@ def recode_to_categories(data_df: pd.DataFrame,
     Args:
         data_df (pd.DataFrame):     DF that contains the input feature.
         new_feature_name (str):     Name of the new feature column in the DF.
-        new_conditions (_type_):    DF mask with the new conditions. 
+        new_conditions:             DF mask with the new conditions. 
         condition_labels (list):    List with the labels (str) of the new conditions-
         verbose (0 or 1, optional): Print statements. Defaults to VERBOSE.
     """
@@ -260,18 +294,15 @@ def recode_to_categories(data_df: pd.DataFrame,
 
 def get_conditions(df_data: pd.DataFrame, feature: str, boundary:int):
     """
-    Create a mask to recode a numerical freature of the DF 
+    Create a mask to recode a numerical freature of input DF df_data 
     to a categorical feature with 3 categories.
     -   Assumes 0 ist the most freq value and this is the first condition.
     -   Two further conditions are added (up to bondary and larger than boundary).
 
     Args:
-        df_data (pd.Dataframe): DF that contrains the feature
+        df_data (pd.Dataframe): DF that contrains the feature to recode.
         feature (str):       Numerical feature used to create the new conditions.
         boundary (int):      Boundary used to create condition 2 and 3.
-
-    Returns:
-        _type_: _description_
     """
     
     new_conditions = [df_data[feature] == 0,
