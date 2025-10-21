@@ -4,16 +4,13 @@
 
 import pandas as pd
 import numpy as np
-import sys
 
-project_path = "d:\\PYTHON\\CS_Bootcamp\\programs\\cs-intrusion-detection-system"
-sys.path.insert(0, project_path + '\scripts')
 # ---------------------------------------- variables ----------------------------------------
 
 VERBOSE = 0 # enable extra print statments with 1, disable with 0
 
 # group features regarding their processing steps
-TARGET_FEATURE = "attack_type " # recoded to binary feature (attack vs no attack) 
+TARGET_FEATURE = "attack_type "     # recoded to binary feature (attack vs no attack) 
 NUM_FEATURES = [
     'srv_serror_rate',
     'same_srv_rate',
@@ -56,7 +53,7 @@ RECODE_NUM_TO_BINARY_CAT = ['num_shells',
                     'wrong_fragment',     # --> works with threshold .99
                     ]
 BINARY_FEATURE_THRESHOLD = 0.99     # only used to find categories in the training data
-BINARY_FEATURE_NEW_CAT = 1          # attention! add check: make sure the first cat is not also 1
+BINARY_FEATURE_NEW_CAT = 1          
 RECODE_NUM_TO_THREE_CAT = {
     'num_compromised': 10, 
     'hot': 5} 
@@ -151,8 +148,8 @@ def is_categorical_dtype(data_df, feature):
 
 def recode_binary_target_feature(
     df_y: pd.DataFrame,
-    input_feature: str,
-    output_feature_name: str,
+    input_feature = TARGET_FEATURE,
+    output_feature_name = "target",
     normal_category_name: str = "normal"
 ) -> pd.DataFrame:
     """

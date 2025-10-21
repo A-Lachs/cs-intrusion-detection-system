@@ -1,16 +1,17 @@
 import sys
 import pandas as pd
 import pickle
+import os
 
 # add path to load own functions from .py files in other dirs
-project_path = "d:\\PYTHON\\CS_Bootcamp\\programs\\cs-intrusion-detection-system"
-sys.path.insert(0, project_path + '\scripts')
-sys.path.insert(0, project_path + '\model')
+project_path = os.getcwd()
+# sys.path.insert(0, project_path + '\scripts')
+# sys.path.insert(0, project_path + '\model')
 
-from preprocessing import *
-from file_handling import *
-from model_evaluation import *
-
+# or better import own functions like this and be able to see type hints ~.~.
+from scripts.preprocessing import *
+from scripts.file_handling import *
+from scripts.model_evaluation import *
 
 # ------------------------------------------ variables ---------------------------------
 
@@ -143,7 +144,7 @@ def run_evaluation_process():
     print("---------------"*2)
     print("+++ Data preprocessing ...")
     # TODO: control edge cases 
-    df_target = recode_binary_target_feature(df_y, "attack_type", "target")
+    df_target = recode_binary_target_feature(df_y)
 
     if len(df_y) != len(y_prediction):
         print("--> Error: length of X and y values do not match!")
@@ -165,6 +166,7 @@ if __name__ == "__main__":
 
     arguments = sys.argv 
     # process CLI arguments
+    # # arguments[0] --> .py file name
     # # arguments[1] --> model specification
     # # arguments[2] --> path to X values for which you want to make a prediciton
     # # arguments[3] --> path to y values which are the true values matching your X values
@@ -176,8 +178,7 @@ if __name__ == "__main__":
         y_prediction = run_prediction_process()
 
         # Mode 2: Evaluation - for 4 arguments
-        # proceed when predictions were successfully made 
-        # and y data (true values) are given
+        # proceed when predictions were successfully made and y data (true values) are given
         if y_prediction is not None and len(arguments) == 4:
             evaluation = run_evaluation_process()
             #print(evaluation)

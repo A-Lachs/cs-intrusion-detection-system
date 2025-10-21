@@ -7,17 +7,24 @@ import os
 
 # --------------------------------- variables ---------------------------------------------
 
-# input 
+# input: kaggle data set names
 file_name_train_data = "KDDTrain+.txt"
 file_name_test_data = "KDDTest+.txt"
 
-# output 
+# prediction output 
 output_file_path = "" #'data/' 
 output_file_name = 'prediction.txt'
 OUTPUT_FILE = output_file_path + output_file_name
 
+# TODO: think about more user friendly solution for prediction output file path 
+# problem: I have a data folder in gitignore, but you would have to manually create it or change path
+# iterim solution: save file in cwd
+# idea: ask for user input, advantage: could also offer alternative ouput options 
+# idea: add a flag 
+# idea: use kaggle api
 
 # ------------------------------- process CLI arguments -----------------------------------
+
 
 def normalize_str(s:str)-> str:
      return s.strip().lower()
@@ -71,7 +78,7 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
     "KDDTrain+.txt" (43 columns or 42 columns without target column.)
 
     Args:
-        path_to_file (str): 
+        path_to_file (str): path to txt or csv file
 
     Returns:
         pd.DataFrame | None: DF with column names as below. 
@@ -88,14 +95,14 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
                "dst_host_srv_rerror_rate", "attack_type", "difficulty_level"]
     
     print("---------------"*2) 
-    print("+++ Reading X data ...")
+    print("+++ Reading data ...")
 
     # Check path
     # print(f"[DEBUG] Checking path: {os.path.abspath(path_to_file)}")
     # print(f"[DEBUG] Exists? {os.path.exists(path_to_file)}")
 
     if not os.path.exists(path_to_file):
-        print(f"--> Error: Cannot find file: '{path_to_file}'.")
+        print(f"--> Error: Cannot find file here: '{path_to_file}'.")
         return None
 
     # count the nr of columns from txt file
@@ -122,6 +129,7 @@ def read_data_to_df(path_to_file:str) -> pd.DataFrame | None:
 def read_single_column_data(path_to_file: str) -> pd.DataFrame | None:
     """
     Reads a text or csv file expecting 1 column (1 str per line).
+    Usage: import y-values (taget variable or true classificatons).
     Accepts:
       - Case 1: column format (1 str per line)
       - Case 2: single line format (with strings seperated by comma, semicolor or space)
@@ -163,76 +171,24 @@ def read_single_column_data(path_to_file: str) -> pd.DataFrame | None:
 
     df = pd.DataFrame(data, columns=["attack_type"])
     print(f"--> Loaded {len(df)} values from '{path_to_file}'.")
+
     return df
 
 
-def read_y_data(path_to_y_data):
+# ------------------------------- output file  -----------------------------------------------
 
-    if path_ok(path_to_y_data):
-        # read y data as df (expecting name of attacks vs normal. ) 
 
-        # check input format 
-        # count the nr of columns from txt file -> expect 1
-        with open(path_to_y_data, 'r') as f:
-            first_line = f.readline().strip()
-    
-        num_cols = len(first_line.split(","))
-        if num_cols ==1:
-            df_y = pd.read_csv(path_to_y_data,  names="attack_type")
-            return df_y
-        else:
-            print("--> Error: Expected 1 column")
-   
-    return
-
-# ------------------------------- create test input  -----------------------------------------
-
-def create_test_input(input_file, output_X:str, output_y:str, nr_lines:int) :
+def write_prediction_output(predictions: list, output_file=OUTPUT_FILE):
     """
-    To test the prediction create seperate input files for X_test and y_test. 
-    Choose nr of lines from the test data. 
+    Creates a text file with one line per prediction (0 or 1). 
+
+    Args:
+        predictions (list):     List with predictions.
+        output_file (str, opt): Path and file name.  
+                                Defaults to OUTPUT_FILE='prediction.txt'.
     """
-    
-    data_df = read_data_to_df(input_file)
-    cols = [c for c in data_df.columns if c != "attack_type"] # remove target "attack_type"
-    df_X = data_df[cols]
-    df_y = data_df["attack_type"]
-
-    if nr_lines < len(data_df):
-    
-        df_X.head(nr_lines).to_csv(f"../{output_X}_{nr_lines}.txt", index=False, header=False, sep=",")
-        df_y.head(nr_lines).to_csv(f"../{output_y}_{nr_lines}.txt", index=False, header=False, sep=",")
-        print(f"Created files '{output_X}_{nr_lines}' and '{output_y}_{nr_lines}'.")
-        return
-    else:
-        print(f"Number of input lines {nr_lines} exceeds available lines {len(data_df)}.")
-        return
-
-
-
-
-
-# ------------------------------- output file  -----------------------------------------
-
-
-def write_prediction_output(predictions, output_file=OUTPUT_FILE):
-    # write predictions to a text file with one line per prediction
     print(f"+++ Writing predictions to: '{os.path.abspath(output_file)}'")
     with open(output_file, "w", encoding="utf-8", newline="") as f: 
             
             for prediction in predictions: 
                     f.write(str(prediction) + "\n")
-
-
-    # TODO: think about more user friendly solution for output file path 
-    # problem: I have a data folder in gitignore, but you would have to manually create it or change the path
-    # iterim solution: save file in cwd
-    # idea: ask for user input, advantage: could also offer alternative ouput options 
-    # idea: add a flag 
-
-# ------------------------------- run to creete input   -----------------------------------------
-
-if __name__ == "__main__":
-
-# create some test input 
-    create_test_input("..\\data\\" + file_name_test_data, 'test_input_X', 'test_input_y',1)
