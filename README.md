@@ -38,7 +38,18 @@ pip install -r requirements.txt --upgrade
 * Hint: use `--upgrade` to install packages listed in requirements.txt or update existing to pinned versions
 * Add the '.env' file to the '.gitignore' file
 
-## 2.  Select parameters and input 
+## 2. Download the data set from kaggle
+
+- You need to download the data from kaggle:
+    - If you want to create and train your own models or run the notebooks for eda and modeling 
+    - If you want to create your own test input files from the kaggle dataset
+    - see: `eda/data_description.md` 
+
+- You do not need to download the data set:
+    - When you want run predictions and evaluations with the provided models and test_input.txt files
+    - Or provide your own input (in the same format)
+
+## 3.  Select parameters and input 
 
 There are 2 different modes (triggered by the amount of CLI arguments).
 -   **Mode 1: Prediciton** 
@@ -68,14 +79,18 @@ There are 2 different modes (triggered by the amount of CLI arguments).
         -   This input has to have the same format as the model was trained on (same number and names of features). 
         -   The files `test_input_X_20.txt` (20 lines) and `test_input_X_1.txt`(one line) contain example cases that were created from the test_data set from kaggle (one case per line). 
         -   These can be used to test predictions about genuine or malicious network traffic.  
-        - Optionally, run [...] and specify the number of cases (lines) in the `create_test_input()` function to create larger input test files from the kaggle test data set. 
-            - Note: This functionality is currently migrated and not working.
-
+        
     - `y-values`
         - This input is required when you know the true classification of the cases for which a prediction is made and you want to evaluate the model performance. 
-        - The number of X-values and y-values has to match, e.g. use `test_input_X_20.txt` with `test_input_y_20.txt`.     
+        - The number of X-values and y-values has to match, e.g. use `test_input_X_20.txt` with `test_input_y_20.txt`.    
 
-## 3. Run the program from CLI  
+- Create own test input files (optional),
+    - requires download of kaggle data set
+    - Create larger test input files from the kaggle test data set with the `create_test_input.py` script
+    - run `create_test_input.py nr_cases` where `nr_cases` is and integer that specifies the number of lines in the  
+    - Note: The maximum nr of cases is 22544.
+
+## 4. Run the program from CLI  
 -   with `python predict.py model_name path_to_X_values path_to_y_values`
 
     -   where the `model_name` is one of `RF`, `BM_mal`, `BM_rand` or `BM_protocol`
@@ -84,11 +99,12 @@ There are 2 different modes (triggered by the amount of CLI arguments).
 - **Example for Mode 1: prediction** 
     -    predict whether network traffic of one example case is genuine or malicious with the random baseline model
     - `python predict.py BM_rand test_input_X_1.txt`
+
 - **Example for mode 2: prediction and evaluation** 
     -   redict whether network traffic of 20 example casesis genuine or malicious  with the Random Forest Classifier
     -   `python predict.py RF test_input_X_1.txt test_input_y_1.txt`
 
-## 4. Interpret the results
+## 5. Interpret the results
 
 - Each prediction procress creates an output file `prediction.txt` where the prediction for each case (line) in the input file is written in a new line: either 0  for genuine or 1 for malicious network traffic.
 - For model evaluation a classification report is printed, compare accuracy, precision and recall values
@@ -96,9 +112,7 @@ There are 2 different modes (triggered by the amount of CLI arguments).
 
 # Future improvements
 - improve evaluation output and description 
-- improve automation: 
-    -   use kaggle API to get the data
-    -   use seperate script to create test input
+- improve automation: use kaggle API to get the data
 - eda: 
     - Create eda summary (md file)
     - Clean the eda notebook and export the functions to the scripts folder for a better overview
