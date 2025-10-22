@@ -46,7 +46,7 @@ pip install -r requirements.txt --upgrade
     - see: `eda/data_description.md` 
 
 - You do not need to download the data set:
-    - When you want run predictions and evaluations with the provided models and test_input.txt files
+    - When you want run predictions and evaluations with the provided models and test_input.txt files (for 1 or 20 cases)
     - Or provide your own input (in the same format)
 
 ## 3.  Select parameters and input 
@@ -125,5 +125,4 @@ There are 2 different modes (triggered by the amount of CLI arguments).
 ----
 ----
 Disclaimer: 
-This is a WIP, I am still learning
-(repo started october 2025)
+This is a WIP (repo started october 2025)
