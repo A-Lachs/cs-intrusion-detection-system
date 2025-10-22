@@ -1,0 +1,53 @@
+{
+    "numerical_features": [
+        "srv_serror_rate",
+        "same_srv_rate",
+        "dst_host_same_srv_rate",
+        "dst_host_srv_diff_host_rate",
+        "dst_host_count",
+        "duration",
+        "src_bytes",
+        "dst_host_diff_srv_rate",
+        "dst_host_srv_serror_rate",
+        "dst_host_serror_rate",
+        "srv_count",
+        "dst_host_srv_rerror_rate",
+        "dst_bytes",
+        "dst_host_srv_count",
+        "serror_rate",
+        "diff_srv_rate",
+        "dst_host_same_src_port_rate",
+        "srv_diff_host_rate",
+        "srv_rerror_rate",
+        "dst_host_rerror_rate",
+        "rerror_rate",
+        "count"
+    ],
+    "categorical_features": [
+        "logged_in",
+        "is_guest_login",
+        "root_shell",
+        "land",
+        "flag",
+        "service",
+        "protocol_type",
+        "difficulty_level"
+    ],
+    "target_feature": [
+        "attack_type"
+    ],
+    "recode_to_binary": [
+        "num_shells",
+        "urgent",
+        "num_root",
+        "num_file_creations",
+        "num_failed_logins",
+        "su_attempted",
+        "num_access_files",
+        "wrong_fragment"
+    ],
+    "recode_to_categories": [
+        "num_compromised",
+        "hot"
+    ]
+}

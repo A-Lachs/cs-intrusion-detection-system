@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-make_toc.py — Automatically generate or update a clickable Table of Contents
+Automatically generate or update a clickable Table of Contents
 for a Jupyter notebook (.ipynb) file.
 NOTE: pip install nbformat
 """
