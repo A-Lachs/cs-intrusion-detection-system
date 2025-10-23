@@ -1,12 +1,11 @@
 import sys
 import pandas as pd
 import pickle
-import os
 
 # add path to load own functions from .py files in other dirs
-project_path = os.getcwd()
-# sys.path.insert(0, project_path + '\scripts')
-# sys.path.insert(0, project_path + '\model')
+#project_path = os.getcwd()  # or use __file__ in a .py script
+#sys.path.insert(0, project_path + '\scripts')
+#sys.path.insert(0, project_path + '\model')
 
 # or better import own functions like this and be able to see type hints ~.~.
 from scripts.preprocessing import *
@@ -15,33 +14,6 @@ from scripts.model_evaluation import *
 
 # ------------------------------------------ variables ---------------------------------
 
-
-# Note: there is no preprocessing for some numerical features, so they are added here for now
-# atm only forest based (or baseline) models are available, where further preprocessing is not necessary
-# based on eda results some numerical features are transformed to categories in the preprocessing step 
-
-numerical_features = ['srv_serror_rate',
-    'same_srv_rate',
-    'dst_host_same_srv_rate',
-    'dst_host_srv_diff_host_rate',
-    'dst_host_count',
-    'duration',
-    'src_bytes',
-    'dst_host_diff_srv_rate',
-    'dst_host_srv_serror_rate',
-    'dst_host_serror_rate',
-    'srv_count',
-    'dst_host_srv_rerror_rate',
-    'dst_bytes',
-    'dst_host_srv_count',
-    'serror_rate',
-    'diff_srv_rate',
-    'dst_host_same_src_port_rate',
-    'srv_diff_host_rate',
-    'srv_rerror_rate',
-    'dst_host_rerror_rate',
-    'rerror_rate',
-    'count']
 
 # Models avaiable for prediction (saved as pkl files, or as functions when starting with BM)
 MODELS = {
@@ -103,9 +75,17 @@ def run_prediction_process():
         # step 3: Preprocessing / feature engineering
         print("---------------"*2)
         print("+++ Data preprocessing ...")
+        
+        # 3A. numerical features
+        loaded_features = load_features_for_preprocessing(verbose=0)
+        numerical_features = loaded_features["numerical_features"]
+        # Note: there is no preprocessing for some numerical features, so they simply added here for now
+        # based on eda results some numerical features are transformed to categories in the next preprocessing step
+        
+        # 3B. categorical features
         categorial_features = preprocessing_categories(df_data)
         
-        # select features (must be the same the model was trained on)
+        # Create DF with preprocesssed features (must be the same the model was trained on)
         df_preprocessed = df_data[ numerical_features + categorial_features]
         # ------------------------------------------------------------
         # Step 4: Prediction
@@ -143,7 +123,7 @@ def run_evaluation_process():
     # step 2. preprocess y data
     print("---------------"*2)
     print("+++ Data preprocessing ...")
-    # TODO: control edge cases 
+    
     df_target = recode_binary_target_feature(df_y)
 
     if len(df_y) != len(y_prediction):
@@ -155,7 +135,6 @@ def run_evaluation_process():
     print("---------------"*2) 
     print("+++ Evaluating predictions ...")
     evaluation_report = print_classification_report(df_target["target"], y_prediction)
-    # TODO: add short report with relevant metrics 
     return evaluation_report
 
 
@@ -185,4 +164,5 @@ if __name__ == "__main__":
 
     else:
         print(f'--> Error: Wrong number of input arguments. Got {len(sys.argv)}, expected 3 or 4.')
+        sys.exit(2)
             

@@ -4,59 +4,23 @@
 
 import pandas as pd
 import numpy as np
+from scripts.file_handling import load_features_for_preprocessing
 
 # ---------------------------------------- variables ----------------------------------------
 
 VERBOSE = 0 # enable extra print statments with 1, disable with 0
 
-# group features regarding their processing steps
-TARGET_FEATURE = "attack_type "     # recoded to binary feature (attack vs no attack) 
-NUM_FEATURES = [
-    'srv_serror_rate',
-    'same_srv_rate',
-    'dst_host_same_srv_rate',
-    'dst_host_srv_diff_host_rate',
-    'dst_host_count',
-    'duration',
-    'src_bytes',
-    'dst_host_diff_srv_rate',
-    'dst_host_srv_serror_rate',
-    'dst_host_serror_rate',
-    'srv_count',
-    'dst_host_srv_rerror_rate',
-    'dst_bytes',
-    'dst_host_srv_count',
-    'serror_rate',
-    'diff_srv_rate',
-    'dst_host_same_src_port_rate',
-    'srv_diff_host_rate',
-    'srv_rerror_rate',
-    'dst_host_rerror_rate',
-    'rerror_rate',
-    'count']
-CAT_FEATURES = [
-    'logged_in', 
-    'root_shell', 
-    'is_guest_login', 
-    'land', 
-    'flag', 
-    'difficulty_level', 
-    'protocol_type', 
-    'service']
-RECODE_NUM_TO_BINARY_CAT = ['num_shells',
-                    'urgent',
-                    'num_root',           # --> works with threshold .99
-                    'num_file_creations',
-                    'num_failed_logins',
-                    'su_attempted',
-                    'num_access_files',
-                    'wrong_fragment',     # --> works with threshold .99
-                    ]
+# load features for preprocessing
+features_for_processing = load_features_for_preprocessing(verbose=VERBOSE)
+
+NUM_FEATURES = features_for_processing["numerical_features"]
+CAT_FEATURES = features_for_processing["categorical_features"]
+RECODE_NUM_TO_BINARY_CAT = features_for_processing["recode_to_2_cat"]
+RECODE_NUM_TO_THREE_CAT = features_for_processing["recode_to_3_cat"]
+TARGET_FEATURE = features_for_processing["target_feature"][0]
+
 BINARY_FEATURE_THRESHOLD = 0.99     # only used to find categories in the training data
 BINARY_FEATURE_NEW_CAT = 1          
-RECODE_NUM_TO_THREE_CAT = {
-    'num_compromised': 10, 
-    'hot': 5} 
 
 # ------------------------------------ utility functions ------------------------------------
 
@@ -75,7 +39,7 @@ def preprocessing_categories(data_df):
 
     """
     new_categories = set([]) # all categorical features after preprocessing 
-
+    
     # --- Part 1: convert categorical variables to categories
     for feature in CAT_FEATURES:
         data_df = convert_column_type(data_df, feature, 'category')
