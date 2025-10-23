@@ -64,11 +64,11 @@ def preprocessing_categories(data_df):
     """
     Wrapper function that includes all preprocessing steps for the respective features. 
 
-    - 1 step: convert categorical variables to categories 
+    - Part 1: convert categorical variables to categories 
         --> CAT_FEATURES
-    - 2 step: recode numerical variables to binary categorical 
+    - Part 2: recode numerical variables to binary categorical 
         --> RECODE_NUM_TO_BINARY_CAT
-    - 3 step: recode numerical variables to categorical with 3 categories 
+    - Part 3: recode numerical variables to categorical with 3 categories 
         --> RECODE_NUM_TO_THREE_CAT
 
     Returns list of all categorical features included in model training. 
@@ -76,7 +76,7 @@ def preprocessing_categories(data_df):
     """
     new_categories = set([]) # all categorical features after preprocessing 
 
-    # --- 1 step: convert categorical variables to categories
+    # --- Part 1: convert categorical variables to categories
     for feature in CAT_FEATURES:
         data_df = convert_column_type(data_df, feature, 'category')
         
@@ -86,7 +86,7 @@ def preprocessing_categories(data_df):
         else:
             print(f"Feature {new_feature} not added to categories, check preprocessing.")
 
-    # --- 2 step: recode numerical variables to binary categorical
+    # --- Part 2: recode numerical variables to binary categorical
     for feature in RECODE_NUM_TO_BINARY_CAT:
         new_feature = feature + "_cat"
         # note: do not use the threshold here, it was used in the training data to define the categories.
@@ -103,7 +103,7 @@ def preprocessing_categories(data_df):
         else:
             print(f"Feature {new_feature} not added to categories, check preprocessing.")
 
-    # --- 3 step: recode numerical variables to categorical with 3 categories
+    # --- Part 3: recode numerical variables to categorical with 3 categories
     category_labels = ["none", "low", "high"] 
     for feature, boundary in RECODE_NUM_TO_THREE_CAT.items():
         
