@@ -4,12 +4,19 @@
 
 import pandas as pd
 import os
+from pathlib import Path
+import json
+
 
 # --------------------------------- variables ---------------------------------------------
+VERBOSE=0
 
 # input: kaggle data set names
 file_name_train_data = "KDDTrain+.txt"
 file_name_test_data = "KDDTest+.txt"
+
+# json file that maps features to preprocessign steps 
+features_json_filename = "eda/features_for_processing.json" 
 
 # prediction output 
 output_file_path = "" #'data/' 
@@ -22,6 +29,61 @@ OUTPUT_FILE = output_file_path + output_file_name
 # idea: ask for user input, advantage: could also offer alternative ouput options 
 # idea: add a flag 
 # idea: use kaggle api
+
+
+# -------------------------------  helper functions ---------------------------------------
+
+
+def get_project_root(criterions=("README.md","pyproject.toml", ".git")) -> Path | None:
+    """
+    Helper function. Return the project root directory by walking upward from this file's location, 
+    looking for criterions (that define a project root dir). 
+    Args:
+        criterions (tuple[str]): filenames that identify the project root
+    Returns:
+        Path: Path object pointing to the project root directory.
+              If no criterion matches, returns None.
+    """
+    # 1. Get absolute path of directory of this script
+    start_dir = Path(__file__).resolve().parent  #  __file__ --> returns location of this file
+    all_parent_dirs = list(start_dir.parents)    # seqeuence of all parent dirs
+    
+    # 2. Iterate through this directory and all its parents
+    for parent in [start_dir] + all_parent_dirs:
+        # Check whether any of the criterion files exist in the current parent
+        for criterion in criterions:   
+            full_path =  os.path.join(parent, criterion)
+            if os.path.exists(full_path):
+                # print(f"Returning root dir: {parent}"")
+                return parent
+            
+    # If nothign found all the way up, return None
+    print("--> Error: Could not find root dir.")
+    return None
+
+
+def load_features_for_preprocessing(json_file_name=features_json_filename, verbose=VERBOSE):
+    
+    #print("\n--- Loading features from json")
+    project_root = get_project_root()
+    if project_root:
+        # create path to file
+        file_path = os.path.join(project_root, json_file_name) 
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                features_for_processing = json.load(f)
+        except Exception as e:
+             print(f"An error occurred: {e}")
+             return
+        else:        
+            if verbose: 
+                print("--- Loaded featuresfrom json file:")
+                for processing_step, features in features_for_processing.items():
+                    print(f"For {processing_step} got {len(features)} features.")
+
+            return features_for_processing
+    print("--> Error: No features loaded.")    
+    return 
 
 # ------------------------------- process CLI arguments -----------------------------------
 
