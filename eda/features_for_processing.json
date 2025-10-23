@@ -24,19 +24,19 @@
         "count"
     ],
     "categorical_features": [
-        "logged_in",
-        "is_guest_login",
-        "root_shell",
         "land",
+        "logged_in",
+        "root_shell",
+        "is_guest_login",
         "flag",
-        "service",
         "protocol_type",
+        "service",
         "difficulty_level"
     ],
     "target_feature": [
         "attack_type"
     ],
-    "recode_to_binary": [
+    "recode_to_2_cat": [
         "num_shells",
         "urgent",
         "num_root",
@@ -46,8 +46,8 @@
         "num_access_files",
         "wrong_fragment"
     ],
-    "recode_to_categories": [
-        "num_compromised",
-        "hot"
-    ]
+    "recode_to_3_cat": {
+        "num_compromised": 10,
+        "hot": 5
+    }
 }
