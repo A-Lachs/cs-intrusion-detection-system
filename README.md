@@ -6,11 +6,11 @@ This repo was created as a capstone project for the Coding Bootcamp for Cybersec
 
 # Features
 
--  The dataset described in `eda/data_desciption.md` was used to train a random forest model to differenciate between genuine and malicious network traffic. 
-- On the basis of an exploratory data analysis (EDA) in the notebook `eda/eda.ipynb ` features were selected and transformed to improve model performance.
-- Different baseline models and random forest models were created and evaluated in the notebook `model/model.ipynb`.
+-  The kaggle [dataset](eda/data_description.md) NSL-KDD99 was used to train a random forest model to distinguish genuine from malicious network traffic (binary classification). 
+- On the basis of an exploratory data analysis (EDA) features were selected and transformed to improve model performance in the [eda](eda/eda.ipynb) notebook.
+- Different baseline models and random forest models were created and evaluated in the [model](model/model.ipynb) notebook. A summary and disusssion can be found [here](model/model_summary.md).  
 - The random forest model performance can be further improved by hyperparameter tuning, the current best model was saved as `model/random_forest_model.pkl` and can be loaded to make predictions. 
-- Make predictions about genuine or malicious network traffic by running `predict.py `(specifying model and input arguments as described below).
+- Make predictions about genuine or malicious network traffic by running `predict.py` (specifying model and input arguments as described below).
 
 
 # How to run the program
@@ -40,24 +40,23 @@ pip install -r requirements.txt --upgrade
 
 ## 2. Download the data set from kaggle
 
-- You need to download the data from kaggle:
-    - If you want to create and train your own models or run the notebooks for eda and modeling 
-    - If you want to create your own test input files from the kaggle dataset
-    - see: `eda/data_description.md` 
-
+- You need to download the [data](eda/data_description.md) from kaggle:
+    - If you want to create and train your own models or run the notebooks for [eda](eda/eda.iypnb) and [modeling](model/model.ipynb) 
+    - If you want to create your own test input files from the kaggle dataset (described below)
+  
 - You do not need to download the data set:
-    - When you want run predictions and evaluations with the provided models and test_input.txt files (for 1 or 20 cases)
-    - Or provide your own input (in the same format)
+    - When you want run predictions and evaluations with the provided models and test input text files (for X and y and 1 or 20 cases)
+    - provide your own input (in the same format as the test input)
 
 ## 3.  Select parameters and input 
 
-There are 2 different modes (triggered by the amount of CLI arguments).
+Make predictions by running `predict.py` with 2 different modes (triggered by the amount of CLI arguments).
 -   **Mode 1: Prediciton** 
     -   Required CLI arguments: 
         -   model name
         -   X-values (path to txt or csv file)
     -   Output: 
-        - file 'prediction.txt' with a prediction (0 or 1) for each line of X-values
+        - file `'prediction.txt'` with a prediction (0 or 1) for each line of X-values
 
 -   **Mode 2: Prediction and evaluation**
     -   Required CLI arguments: 
@@ -65,14 +64,14 @@ There are 2 different modes (triggered by the amount of CLI arguments).
         -   X-values (path to txt or csv file)
         -   corresponding y-values (path to txt or csv file)
     -   Output: 
-        -   file 'prediction.txt' with a prediction (0 or 1) for each line of X-values
-        -   evaluation: prints full classification report (for now)  
+        -   file `'prediction.txt'` with a prediction (0 or 1) for each line of X-values
+        -   evaluation: prints full classification report 
 
 - Available models:
-    - `'RF'` --> Trained Random Forest Classifier
+    - `'RF'` --> Random Forest Classifier
     - `'BM_mal'` --> Baseline Model, always predict malicious network traffic (1)
     - `'BM_rand'` --> Baseline Model, randomly predict genuine or malicius network traffic 
-    - `'BM_protocol'` --> Baseline model, predict malicious network traffic when imcp is used
+    - `'BM_protocol'` --> Baseline model, predict malicious network traffic when the protocol 'imcp' is used
 
 - Input specifications:
     - ` X-values`
@@ -84,7 +83,7 @@ There are 2 different modes (triggered by the amount of CLI arguments).
         - This input is required when you know the true classification of the cases for which a prediction is made and you want to evaluate the model performance. 
         - The number of X-values and y-values has to match, e.g. use `test_input_X_20.txt` with `test_input_y_20.txt`.    
 
-- Create own test input files (optional),
+- Create own test input files (optional):
     - requires download of kaggle data set
     - Create larger test input files from the kaggle test data set with the `create_test_input.py` script
     - run `create_test_input.py nr_cases` where `nr_cases` is and integer that specifies the number of lines in the  
@@ -101,28 +100,26 @@ There are 2 different modes (triggered by the amount of CLI arguments).
     - `python predict.py BM_rand test_input_X_1.txt`
 
 - **Example for mode 2: prediction and evaluation** 
-    -   redict whether network traffic of 20 example casesis genuine or malicious  with the Random Forest Classifier
+    -   predict whether network traffic of 20 example cases is genuine or malicious with the Random Forest Classifier
     -   `python predict.py RF test_input_X_1.txt test_input_y_1.txt`
 
 ## 5. Interpret the results
 
 - Each prediction procress creates an output file `prediction.txt` where the prediction for each case (line) in the input file is written in a new line: either 0  for genuine or 1 for malicious network traffic.
-- For model evaluation a classification report is printed, compare accuracy, precision and recall values
+- For model evaluation a classification report is printed, compare accuracy, precision and recall values (discussed [here](model/model_summary.md)).
 
 
 # Future improvements
-- improve evaluation output and description 
+- make evaluation output and description more specific (than printing the classification report)
 - improve automation: use kaggle API to get the data
 - eda: 
     - Create eda summary (md file)
-    - Clean the eda notebook and export the functions to the scripts folder for a better overview
+    - Clean the eda notebook (export the functions to the scripts folder for a better overview)
 - models:
-    - Create summary for model evaluation and comparison (md file)
-    - Clean the model notebook
-    - add own precrocessing func to pipeline
+    - add own precrocessing steps to pipeline
     - Train and compare more models for binary classification (e.g., XGBoost)
 
 ----
 ----
-Disclaimer: 
-This is a WIP (repo started october 2025)
+
+This is a WIP (started the repo in october 2025)
