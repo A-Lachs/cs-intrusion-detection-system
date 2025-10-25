@@ -65,7 +65,7 @@ def make_predictions(model, Xtrain, Xtest):
 
 def print_classification_report(y_true, y_pred) -> dict:
     """
-    Print and return a classification report.
+    Print and return a classification report (as dict).
     Note: in case one class is not predicted, prevent zero division warning
     by adding the parameter 'zero_division=0'. 
     """
@@ -74,6 +74,93 @@ def print_classification_report(y_true, y_pred) -> dict:
     print("Classification Report:\n", cr)
     print("------"*10)
     return classification_report(y_true, y_pred, output_dict=True, zero_division=0)
+
+
+def add_metrics_to_dict(model_evaluation_dict:dict, 
+                        model_name:str, 
+                        dataset: str, 
+                        y_true, 
+                        y_pred, 
+                        class_nr='1'):
+    """
+    Add dict of model_name -> dataset -> metrics to a dict 'model_evaluation_dict'.
+    Print the classification report (cr) using helper func print_classification_report() 
+    that returns cr as dict. 
+    Usage: This function is used to collect the metrics of different models in one dict. 
+
+    Args:
+        model_evaluation_dict:  Dict to which a new dict is added.
+        model_name (str):       Key of the Dict to be added
+        dataset (str):          train or test
+        y_true (list):          True class labels
+        y_pred (list):          Predicted class labels
+        class_nr (str):         Class the metrics refer to. Defaults to '1'.
+                                Metrics are extracted from the classification report.
+
+    Returns:
+        dict:   data =  {'model_name': {
+                            'train': {'accuracy': 0.99, 'precision': 0.99, 'recall': 0.99},
+                            'test': {'accuracy': 0.91, 'precision': 0.91, 'recall': 0.91}}}
+    """
+   
+    cr = print_classification_report(y_true, y_pred)
+    metrics_keys = ['accuracy', 'precision', 'recall']
+    metrics_values = [cr['accuracy'], cr[class_nr]['precision'], cr[class_nr]['recall']]
+    metrics = dict(zip(metrics_keys, metrics_values))
+
+    if model_name not in model_evaluation_dict:
+        model_evaluation_dict[model_name] = {}   
+        
+    model_evaluation_dict[model_name][dataset] = metrics
+    model_evaluation_dict
+    return model_evaluation_dict
+
+
+def dict_to_grouped_markdown_table(data:dict, floatfmt=".2f"):
+    """
+    Convert a nested dict of model_name -> dataset -> metrics
+    into a Markdown table.
+    Usage: From a 'model_evaluation_dict' print all the entries 
+    in a format that can be copied into a markdown file to get 
+    a pretty table for model comparison.
+
+    data =  {'model_name': {
+                'train': {'accuracy': 0.99, 'precision': 0.99, 'recall': 0.99},
+                'test': {'accuracy': 0.91, 'precision': 0.91, 'recall': 0.91}}}
+    """
+    # get metric names 
+    metrics = set()
+    for model in data.values():             # iterate over models
+        for dataset in model.values():      # iterate over train/test
+            for metric in dataset.keys():   # iterate over metric names
+                metrics.add(metric)
+    metrics = sorted(metrics)
+    
+    # create table header
+    headers = [h.title() for h in (["model", "dataset"] + metrics)]
+    header_line = "| " + " | ".join(headers) + " |"
+    align_line = "|:------|:--------|" + "|".join([":----------:" for _ in metrics]) + "|"
+    lines = [header_line, align_line]
+    
+    # build rows of table
+    for model, datasets in data.items():
+        first = True
+        for dataset, vals in datasets.items():
+            row = []
+            # only show model name in first row
+            row.append(model if first else "")
+            row.append(dataset)
+            for metric in metrics:
+                val = vals.get(metric, "")  # get value or empty str if missing
+                # convert to str
+                if isinstance(val, float):  # and format if float
+                    row.append(format(val, floatfmt))
+                else:
+                    row.append(str(val))   
+            lines.append("| " + " | ".join(row) + " |")
+            first = False
+    
+    return "\n".join(lines)
 
 
 def plot_confusion_matrix(y_true:list, y_pred:list, classes=None, normalize='true', verbose=1):

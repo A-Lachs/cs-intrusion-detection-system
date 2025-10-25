@@ -100,28 +100,28 @@ Accuracy gives a general overview of the model performance. In unbalanced datase
 | Model | Dataset | Accuracy | Precision | Recall |
 |:------|:--------|:----------:|:----------:|:----------:|
 | RF_basic | train | 0.99 | 0.98 | 0.99 |
-|  | test | 0.83 | 0.92 | 0.77 |
+|  | test | 0.81 | 0.91 | 0.74 |
+|  |  |  |  |  |
 | RF_best | train | 0.98 | 0.97 | 0.98 |
-|  | test | 0.84 | 0.92 | 0.78 |
-
+|  | test | 0.84 | 0.92 | 0.80 |
 
 ### Interpretation
 
 - `RF_basic`:
-    - The discrepancy in prediction Accuracy between the train and test data set (99% vs 83%) indicates that the basic RF model is overfitting: it performs very well on the training data but fails to generalize effectively to unseen data.
-    - This tendency is also true for Precision (98% vs 92%) and Recall (99% vs 77%). 
+    - The discrepancy in prediction Accuracy between the train and test data set (99% vs 81%) indicates that the basic RF model is overfitting: it performs very well on the training data but fails to generalize effectively to unseen data.
+    - This tendency is also true for Precision (98% vs 91%) and Recall (99% vs 74%). 
     - Precision Recall tradeoff:
-         -  With a Precision of 92% on test data this model performes already resonably well, if the goal is to be sure that a detection alarm is only raised when the network traffick is truly malicious. 
-         - Howerer the Recall is only 77%, indicating that the model is more likely to misse actual malicious network traffic. 
+         -  With a Precision of 91% on test data this model performes already resonably well, if the goal is to be sure that a detection alarm is only raised when the network traffick is truly malicious. 
+         - Howerer the Recall is only 74%, indicating that the model is more likely to misse actual malicious network traffic. 
     - Implication
         - In an nIDS it is usually more important to catch as many attacks as possible instead of missing them, therefore a higher Recall would be preferable. 
 - `RF_best`:
-    - Compared to the basic Random Forest model, this model does not perform considerably better, because the metrics only vary by 1%. The implication is the same.
+    - Compared to the basic Random Forest model, this model does perform slightly better: with an overall accuracy of 84% with unseen data. The Precision is similar with 92% and the Recall is better with 80%. The implications are the same.
     
 ## 3. Model comparison and implications
-- With an Accucary of 83% and 84% in unseen data both RF models can detect malicious network traffic better than the Baseline models (which performed at chance level). Good. 
-- However, it can be argued that With a Recall of 77% and 87% with unseen data the best model still misses too many attacks.
-    - Example: From 1000 cases of malicious network traffic the model would only detect 780 cases (True positives = recall x total class 1) and miss the other 220 cases (False negatives = total class 1 - detected)
+- With an Accucary of 81% vs 84% in unseen data both RF models can detect malicious network traffic better than the Baseline models (which performed at chance level). Good. 
+- However, it can be argued that With a Recall of 74% vs 80% with unseen data the best models still miss too many attacks.
+    - Example: From 1000 cases of malicious network traffic the best model would detect 800 cases (True positives = recall x total class 1) and miss the other 200 cases (False negatives = total class 1 - detected)
 
 -  Future Improvements:
     - Hyperparameter tuning and feature enginnering could improve the performance of Random Forest Models
