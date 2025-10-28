@@ -25,58 +25,71 @@ test_data = pd.read_csv(file_path + file_name_test_tata, names=column_names)
 
 # Data description 
 
-Overview and description of the variables in the dataset. Will be updated continously...
+Overview and description of the variables in the train dataset.
     
 
 | Column name | Column values| Description |
 | --- | ----------- |---|
-| duration | - | Duration of the connection in seconds |
+| duration | M = 287.14</br>SD = 2604.52 | Duration of the connection in seconds |
 | protocol_type | categorical, 3 types | Type of protocol ([TCP](#tcp---transmission-control-protocol), [UDP](#udp---user-datagram-protocol), [ICMP](#icmp---internet-control-message-protocol)) |
-| service |  categorical, 70 different services | Network service on the destination (http, ftp, smtp)  |
-| flag |  categorical, 11 different flags | Status of connection</br>('SF', 'S0', 'REJ', 'RSTR', 'SH', 'RSTO', 'S1', 'RSTOS0', 'S3', 'S2', 'OTH')  |
-| src_bytes |  - | Bytes sent from source to destination |
-| dst_bytes |  - | Bytes sent from destination to source |
+| service |  categorical, 70 different services | Network service on the destination (http, ftp, smtp, ...)  |
+| flag |  categorical, 11 different flags | Status of connection</br>(SF, S0, REJ, RSTR, SH, RSTO, S1, RSTOS0, S3, S2, OTH)  |
+| src_bytes |  M = 0.05 MB</br> SD = 5.87 MB | Bytes sent from source to destination |
+| dst_bytes |  M = 0.02 MB</br> SD = 4.02 MB  | Bytes sent from destination to source |
 | land | bool | 1: connection to/from same host <br/>0: otherwise |
 | wrong_fragment |  0, 1, 3 | Nr of wrong fragments |
 | urgent | 0-3 | Nr of urgent packets |
-| hot | 0-77 | Nr of hot indicatiors |
+| hot | 28 different values in range 0-77 | Nr of hot indicatiors |
 | num_failed_logins |  0-5 | Nr of failed login attempts |
 | logged_in |  bool  | 1: successfully logged in <br/>0: otherwise|
-| num_compromised |  - | Nr of compromised conditions |
+| num_compromised |  88 different values in range 0-7479 | Nr of compromised conditions |
 | root_shell |  bool | 1: root shell obtained <br/>0: otherwise |
 | su_attempted |  0, 1, 2 | 'su root' command attempt |
-| num_root |  - | Nr of root accesses |
-| num_file_creations |  - | Nr of file creation operations |
+| num_root | 82 different values in range 0-7468| Nr of root accesses |
+| num_file_creations | 35 different values in range 0-43 | Nr of file creation operations |
 | num_shells |  0,1,2 | Nr of shell prompts invoked |
 | num_access_files |  0-9 | Nr of access file control operations |
 | num_outbound_cmds |  always 0 | Nr of outbound commands |
 | is_host_login |  bool | 1: login belongs to host </br>0: otherwise |
 | is_guest_login |  bool | 1: login from guest account <br/>0: otherwise |
-| count |  - | Nr of connections to **same host** as current connection in past 2s |
-| srv_count |  - | Nr of connections to the **same service** as current connection in past 2s |
-| serror_rate |  - | Percentage of connections with **SYN** errors |
-| srv_error_rate |  - | Percentage of connections with **SYN** errors for same service|
-| rerror_rate |  - | Percentage of connections with **REJ** errors |
-| srv_rerror_rate |  - | Percentage of connections with **REJ** errors for same service|
-| same_srv_rate |  - | Percentage of connections to the same service|
-| diff_srv_rate |  - | Percentage of connections to different services|
-| srv_diff_host_rate |  - | Percentage of connections to different hosts|
-| dst_host_count |  - | Count of destinations hosts accessed|
-| dst_host_srv_count |  - | Count of connections to the same service at the destination|
-| dst_host_same_srv_rate |  - | Percentage of connections to the **same service** at the destination|
-| dst_host_diff_srv_rate |  - | Percentage of connections to **different services** at the destination|
-| dst_host_same_src_port_rate |  - | Percentage of connections to same source port |
-| dst_host_srv_diff_host_rate |  - | Percentage of different hosts connected via same service |
-| dst_host_serror_rate |  - | Percentage of **SYN** errors at the destination host |
-| dst_host_srv_serror_rate |  - | Percentage of **SYN** errors for the same service at the destination |
-| dst_host_rerror_rate |  - | Percentage of **REJ** errors at the destination host |
-| dst_host_srv_rerror_rate |  - | Percentage of **REJ** errors for the same service at the destination |
+| count |  M = 84.11 </br>SD = 114.51 | Nr of connections to **same host** as current connection in past 2s |
+| srv_count |   M = 27.74 </br>SD = 72.64 | Nr of connections to the **same service** as current connection in past 2s |
+| serror_rate |  M = 0.28 </br>SD = 0.45 | Percentage of connections with **SYN** errors |
+| srv_error_rate | M = 0.28 </br>SD = 0.45 | Percentage of connections with **SYN** errors for same service|
+| rerror_rate |  M = 0.12 </br>SD = 0.32| Percentage of connections with **REJ** errors |
+| srv_rerror_rate | M = 0.12 </br>SD = 0.32 | Percentage of connections with **REJ** errors for same service|
+| same_srv_rate |  M = 0.66 </br>SD = 0.44  | Percentage of connections to the same service|
+| diff_srv_rate |  M = 0.06 </br>SD = 0.18  | Percentage of connections to different services|
+| srv_diff_host_rate |  M = 0.10 </br>SD = 0.26 | Percentage of connections to different hosts|
+| dst_host_count |  M = 182.15 </br>SD = 99.21  | Count of destinations hosts accessed|
+| dst_host_srv_count |  M = 115.65 </br>SD = 110.70 | Count of connections to the same service at the destination|
+| dst_host_same_srv_rate |  M = 0.52 </br>SD = 0.45 | Percentage of connections to the **same service** at the destination|
+| dst_host_diff_srv_rate |  M = 0.08 </br>SD = 0.19  | Percentage of connections to **different services** at the destination|
+| dst_host_same_src_port_rate |  M = 0.15 </br>SD = 0.31  | Percentage of connections to same source port |
+| dst_host_srv_diff_host_rate |  M = 0.03 </br>SD = 0.11  | Percentage of different hosts connected via same service |
+| dst_host_serror_rate |  M = 0.28 </br>SD = 0.44  | Percentage of **SYN** errors at the destination host |
+| dst_host_srv_serror_rate |  M = 0.28 </br>SD = 0.45 | Percentage of **SYN** errors for the same service at the destination |
+| dst_host_rerror_rate |  M = 0.12 </br>SD = 0.31 | Percentage of **REJ** errors at the destination host |
+| dst_host_srv_rerror_rate |  M = 0.12 </br>SD = 0.32  | Percentage of **REJ** errors for the same service at the destination |
 | attack_type |  categorical, 23 different types | normal, neptune, ... |
-| difficulty_level |  - | - |
+| difficulty_level |  22 different values in range 0-21 | - |
 
 </br>
 </br>
 
+## Target feature `attack_type`
+
+- In the training data set 53.46 % of cases are genuine network traffic. 
+
+| attack_type   |   proportion |
+|:--------------|-------------:|
+| normal        |         0.53 |
+| neptune       |         0.33 |
+| other         |         0.04 |
+| satan         |         0.03 |
+| ipsweep       |         0.03 |
+| portsweep     |         0.02 |
+| smurf         |         0.02 |
 
 #  Background information 
 
