@@ -106,13 +106,13 @@ def sum_category_by_proportion(data_df:pd.DataFrame,
         print(f"The feature {feature} is not categorical.")
         return
     
-    
+
 def aggregate_feature_by_target(data_df: pd.DataFrame, feature: str, target, verbose=1) -> pd.DataFrame:
     """ This function takes a categorical feature of from data_df and counts it grouped by the target variable.
         It also returns a df with the percentages.
 
     Args:
-        data_df (pd.DataFrame): df that contains feature and target var for each client
+        data_df (pd.DataFrame): df that contains feature and target var
         feature (str):          name of feature to aggregate
         target (str, optional): name of target variable to group by. Defaults to 'target'.
 

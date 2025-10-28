@@ -25,6 +25,9 @@ test_data = pd.read_csv(file_path + file_name_test_tata, names=column_names)
 
 # Data description 
 
+-   The training data frame has 125973 rows and 43 columns.
+-   The test data frame has 22544 rows and 43 columns.
+
 Overview and description of the variables in the train dataset.
     
 
@@ -71,25 +74,16 @@ Overview and description of the variables in the train dataset.
 | dst_host_srv_serror_rate |  M = 0.28 </br>SD = 0.45 | Percentage of **SYN** errors for the same service at the destination |
 | dst_host_rerror_rate |  M = 0.12 </br>SD = 0.31 | Percentage of **REJ** errors at the destination host |
 | dst_host_srv_rerror_rate |  M = 0.12 </br>SD = 0.32  | Percentage of **REJ** errors for the same service at the destination |
-| attack_type |  categorical, 23 different types | normal, neptune, ... |
+| [attack_type](#feature-attack_type) |  categorical, 23 different types | normal, neptune, warezclient, ipsweep, portsweep, teardrop, nmap, satan, smurf, pod, back, guess_passwd, ftp_write, multihop, rootkit, buffer_overflow, imap, warezmaster, phf, land, loadmodule, spy, perl |
 | difficulty_level |  22 different values in range 0-21 | - |
 
-</br>
-</br>
+## Feature `attack_type`
 
-## Target feature `attack_type`
-
+- This feature is used to create a binary target variable, because it identifies genuine vs malicious network traffic. 
 - In the training data set 53.46 % of cases are genuine network traffic. 
+- For display: Attack types with a proportion < 2% are summarized to 'other' category. 
 
-| attack_type   |   proportion |
-|:--------------|-------------:|
-| normal        |         0.53 |
-| neptune       |         0.33 |
-| other         |         0.04 |
-| satan         |         0.03 |
-| ipsweep       |         0.03 |
-| portsweep     |         0.02 |
-| smurf         |         0.02 |
+![Image: pie plot of attack types](../images/pie_plot_attack_types.png)
 
 #  Background information 
 
