@@ -17,38 +17,58 @@ This repo was created as a capstone project for the Coding Bootcamp for Cybersec
 
 ## 1.  Set up the virtual environment
 
-**Mac0S**
+**Mac0S/Linux**
 ```
 pyenv local 3.11.3
 python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
-pip install -r requirements.txt --upgrade
+pip install -r requirements.txt
 ```
 
-**WindowsOS git-bash CLI**
+**WindowsOS with Git Bash CLI**
 ```
 pyenv local 3.11.3
 python -m venv .venv
 source .venv/Scripts/activate
 python.exe -m pip install --upgrade pip
-pip install -r requirements.txt --upgrade
+pip install -r requirements.txt
 ```
 
-* Hint: use `--upgrade` to install packages listed in requirements.txt or update existing to pinned versions
-* Add the '.env' file to the '.gitignore' file
+* Hint when pip installing requirements: 
+    -   use `--upgrade` flag carefully
+    -   optionally try a dry run: `pip install --upgrade --upgrade-strategy only-if-needed --dry-run -r requirements.txt`
+    -   when there are no conflicts, use: `pip install --upgrade --upgrade-strategy only-if-needed -r requirements.txt`
 
-## 2. Download the data set from kaggle
 
-- You need to download the [data](eda/data_description.md) from kaggle:
+## 2. Add `.gitignore` file
+
+- avoid uploading environment variables or data sets 
+- create a .`gitignore` file or add '.env' and 'data/' to an existing one (avoiding duplicates)
+- works for Git Bash and macOS/Linux
+
+```
+{
+  echo ""
+  echo "# Environment and data files"
+  grep -qxF '.env' .gitignore || echo '.env'
+  grep -qxF 'data/' .gitignore || echo 'data/'
+} >> .gitignore
+```
+
+
+## 3. Download the data set from kaggle
+
+- Download the NSL-KDD99 dataset from [kaggle](https://www.kaggle.com/datasets/kaggleprollc/nsl-kdd99-dataset/data) and save in in the `data/` directory
+- You need to download the dataset:
     - If you want to create and train your own models or run the notebooks for [eda](eda/eda.iypnb) and [modeling](model/model.ipynb) 
     - If you want to create your own test input files from the kaggle dataset (described below)
   
 - You do not need to download the data set:
-    - When you want run predictions and evaluations with the provided models and test input text files (for X and y and 1 or 20 cases)
+    - If you want run predictions and evaluations with the provided models and test input text files (for X and y and 1 or 20 cases)
     - provide your own input (in the same format as the test input)
 
-## 3.  Select parameters and input 
+## 4.  Select parameters and input 
 
 Make predictions by running `predict.py` with 2 different modes (triggered by the amount of CLI arguments).
 -   **Mode 1: Prediciton** 
@@ -89,7 +109,7 @@ Make predictions by running `predict.py` with 2 different modes (triggered by th
     - run `create_test_input.py nr_cases` where `nr_cases` is and integer that specifies the number of lines in the  
     - Note: The maximum nr of cases is 22544.
 
-## 4. Run the program from CLI  
+## 5. Run the program from CLI  
 -   with `python predict.py model_name path_to_X_values path_to_y_values`
 
     -   where the `model_name` is one of `RF`, `BM_mal`, `BM_rand` or `BM_protocol`
@@ -103,7 +123,7 @@ Make predictions by running `predict.py` with 2 different modes (triggered by th
     -   predict whether network traffic of 20 example cases is genuine or malicious with the Random Forest Classifier
     -   `python predict.py RF test_input_X_1.txt test_input_y_1.txt`
 
-## 5. Interpret the results
+## 6. Interpret the results
 
 - Each prediction procress creates an output file `prediction.txt` where the prediction for each case (line) in the input file is written in a new line: either 0  for genuine or 1 for malicious network traffic.
 - For model evaluation a classification report is printed, compare accuracy, precision and recall values (discussed [here](model/model_summary.md)).

@@ -1,5 +1,19 @@
-pandas==2.3.3
-tabulate
-matplotlib
-seaborn
+
+# core Python packages
+numpy==1.26.0
+pandas==2.1.0
+
+# plotting and visualization
+matplotlib==3.10.7
+seaborn==0.12.2
+scipy==1.11.1
+scikit-learn==1.3.1
+tabulate==0.9.0
 scikit-metrics
+
+# Jupyter and notebook support
+jupyterlab==4.3.3          # JupyterLab environment
+notebook==7.3.0             # Notebook support
+ipykernel==6.25.1           # Kernel for Jupyter (ensures matplotlib works)
+matplotlib-inline==0.1.6    # Provides the 'inline' backend for %matplotlib inline
+
