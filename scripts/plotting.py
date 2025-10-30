@@ -3,6 +3,7 @@
 ##########################################################
 
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -16,10 +17,7 @@ TARGET_LABELS = ["genuine", "malicious"]
 # headline parameters
 TITLE_STYLES = {
     "main": {"fontsize": 12, "fontweight": "bold", "y": 0.92},
-    "sub": {"fontsize": 10, "fontweight": "normal", 'loc':'left', 'pad': 10},}
-# y -> vertical pos of title relative to fig: 0  bottom of fig, 1 top of fig
-# pad -> vertical space in point between title txt and axes
-# combine with plt.tight_layout(rect=[0, 0, 1, 0.95])  # to leave enogh space at to of fig (for titles)
+    "sub": {"fontsize": 10, "fontweight": "normal", 'loc':'left', 'pad': 8},}
 
 
 #  --------------------------------------- helper functions -----------------------------------------
@@ -32,6 +30,36 @@ def pretty_category_str(feature:str) -> str:
     if category_name.endswith("y"):
         category_name = category_name[:-1] + "ie"
     return category_name + "s"
+
+
+def adjust_title_styles(n_categories: int):
+    """
+    Returns adjusted title styles and layout depending on number of categories.
+    Keeps TITLE_STYLES unchanged.
+    Usage: When horizontal barplot height is dynamically adjusted with nr of categories, 
+    title parameters (y and pad) and layout need to be adapted, too.
+
+        - y     -> vertical pos of title relative to fig: 0 bottom of fig, 1 top of fig
+        - pad   -> vertical space in point between title txt and axes
+        - top_margin -> in plt.tight_layout(rect=[0, 0, 1, top_margin]) is increased
+          to leave enough space at top of fig (for titles)
+    """
+    styles = TITLE_STYLES
+
+    # smooth scaling factor between 0 (compact) and 1 (spacious)
+    scale = np.clip((n_categories - 10) / 60, 0, 1)
+
+    # adjust figure title position (slightly higher for tall plots)
+    styles["main"]["y"] = 0.92 + 0.03 * scale
+
+    # adjust subtitle padding (less space when tall)
+    styles["sub"]["pad"] = 10 - 7 * scale
+    
+    # adjust layout rect top margin (space reserved for titles)
+    top_margin =  0.95 + 0.02 * scale
+    layout_rect = [0, 0, 1, top_margin]
+
+    return styles, layout_rect
 
 # -------------------------------------------- pie plot ---------------------------------------------
 
@@ -78,7 +106,7 @@ def plot_to_pie(data_df, feature):
     # equal aspect ratio ensures pie is drawn as circle
     ax.axis("equal")
 
-    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top figure height free (for titles)
     plt.show()
 
 # ---------------------------------------------- bar plots --------------------------------------------
@@ -102,34 +130,38 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
         feature (str):          Name of categorical feature
         target (str):           Name of (binary) target feature
     """
-    plot_hight = 4
-    plot_width = 6
-
+    
     category_oder = data_df[feature].unique()   # keep category order of the input df for plotting
     n_categories = len(category_oder)
     
-    # adjust plot hight depending on nr of categories
-    if n_categories > 15:
-        plot_hight = max(plot_hight, n_categories* 0.2)
-    
-    plt.figure(figsize=(plot_width, plot_hight))  
+    plot_width = 6
+    plot_height = 4
 
+    # adjust plot height by nr of categories 
+    plot_height = max(plot_height, n_categories* 0.2)
+
+    plt.figure(figsize=(plot_width, plot_height))  
+    
+    # plot data 
     ax = sns.barplot(
         data=data_df, 
         x="count", 
         y=feature, 
         hue=target, 
-        order=category_oder,
+        order=category_oder,        # keep feature order of the input df
         palette=[COLOR_1, COLOR_2]
-    )
-    
+        )
+
+    # load and adapt default title styles relative to nr of categories
+    styles, layout_rect = adjust_title_styles(n_categories)
+
     # optimize figure title 
     renamed_feature = pretty_category_str(feature)
     plt.suptitle(f"Frequency of network traffic by {renamed_feature}",
-                  **TITLE_STYLES["main"])
+                  **styles["main"])
     # add subtitle 
     plt.title("Ranked by malicious traffic percentage (%)", 
-              **TITLE_STYLES["sub"])
+              **styles["sub"])
 
     # optimize legend title and labels
     handles, labels = ax.get_legend_handles_labels()
@@ -159,7 +191,7 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     # set y-tick labels 
     ax.set_yticklabels(new_labels, va='center')
     
-    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
+    plt.tight_layout(rect=layout_rect) # leave space at top of figure (for titles)
     plt.show()
 
 
@@ -181,19 +213,19 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
         feature (str):          Name of categorical feature
         target (str):           Name of (binary) target feature
     """
-   
-    plot_hight = 4
-    plot_width = 6 
 
     category_oder = data_df[feature].unique() # keep category order of the input df for plotting
     n_categories = len(category_oder)
     
-     # adjust plot hight depending on nr of categories
-    if n_categories > 15:
-        plot_hight = max(plot_hight, n_categories* 0.2)
+    plot_width = 6
+    plot_height = 4
 
-    plt.figure(figsize=(plot_width, plot_hight))    # adjust plot size 
-    sub_df = data_df[(data_df[target] == 1)]        # only plot malicious network traffic
+    # adjust plot height by nr of categories 
+    plot_height = max(plot_height, n_categories* 0.2)
+
+    plt.figure(figsize=(plot_width, plot_height))    
+
+    sub_df = data_df[(data_df[target] == 1)]    # only plot malicious network traffic
 
     # seaborn barblot
     ax = sns.barplot(
@@ -203,16 +235,20 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
             order=category_oder, # keep feature order of the input df
             color=COLOR_2,       # only red for malicious network traffic
     )
+
+    # load and adapt default title styles relative to nr of categories
+    styles, layout_rect = adjust_title_styles(n_categories)
+
     # optimize legend
     ax.legend_ = None
 
     # optimize figure title 
     renamed_feature = pretty_category_str(feature)
     plt.suptitle(f"Percent of malicious network traffic by {renamed_feature}",
-                  ** TITLE_STYLES['main'])
+                  ** styles['main'])
     # add subtitle 
     plt.title("Ranked by percentage descending (n total cases)",
-               **TITLE_STYLES['sub'])
+               **styles['sub'])
     
     # optimize y and x labels
     ax.set_ylabel(feature.replace("_", " ").capitalize())
@@ -230,7 +266,6 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
         .sum()
         .reindex(sub_df[feature].values)  # keep same order as plotted
     )
-
     # create new labels 
     new_labels = [
         f"{str(cat).capitalize()} (n={total_counts.get(cat, 0)})"
@@ -239,7 +274,7 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     # set y-tick labels 
     ax.set_yticklabels(new_labels, va='center')
 
-    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
+    plt.tight_layout(rect=layout_rect)  # leave space at top of figure (for titles)
     plt.show()
 
 # --------------------------------------- aggregation functions ---------------------------------------
