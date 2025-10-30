@@ -1,5 +1,5 @@
 
-# Data source and import 
+# 1. Data source and import 
 
 The analysis is based on the network infiltration dataset (NSL-KDD99) downloaded from [kaggle](https://www.kaggle.com/datasets/kaggleprollc/nsl-kdd99-dataset/data).
 
@@ -23,20 +23,20 @@ test_data = pd.read_csv(file_path + file_name_test_tata, names=column_names)
 ```
 </br>
 
-# Data description 
+# 2. Data overview 
 
+Overview and description of the variables in the datasets.
 -   The training data frame has 125973 rows and 43 columns.
--   The test data frame has 22544 rows and 43 columns.
+-   The test data frame has 22544 rows and 43 columns.   
 
-Overview and description of the variables in the train dataset.
-    
+Plots and descriptive statistics always refer to the training data set.
 
 | Column name | Column values| Description |
 | --- | ----------- |---|
 | duration | M = 287.14</br>SD = 2604.52 | Duration of the connection in seconds |
-| protocol_type | categorical, 3 types | Type of protocol ([TCP](#tcp---transmission-control-protocol), [UDP](#udp---user-datagram-protocol), [ICMP](#icmp---internet-control-message-protocol)) |
+| [protocol_type](#feature-protocol_type) | categorical, 3 types | Type of protocol ([TCP](#tcp---transmission-control-protocol), [UDP](#udp---user-datagram-protocol), [ICMP](#icmp---internet-control-message-protocol)) |
 | service |  categorical, 70 different services | Network service on the destination (http, ftp, smtp, ...)  |
-| flag |  categorical, 11 different flags | Status of connection</br>(SF, S0, REJ, RSTR, SH, RSTO, S1, RSTOS0, S3, S2, OTH)  |
+| [flag](#feature-flag) |  categorical, 11 different flags | Status of connection</br>(SF, S0, REJ, RSTR, SH, RSTO, S1, RSTOS0, S3, S2, OTH)  |
 | src_bytes |  M = 0.05 MB</br> SD = 5.87 MB | Bytes sent from source to destination |
 | dst_bytes |  M = 0.02 MB</br> SD = 4.02 MB  | Bytes sent from destination to source |
 | land | bool | 1: connection to/from same host <br/>0: otherwise |
@@ -75,17 +75,53 @@ Overview and description of the variables in the train dataset.
 | dst_host_rerror_rate |  M = 0.12 </br>SD = 0.31 | Percentage of **REJ** errors at the destination host |
 | dst_host_srv_rerror_rate |  M = 0.12 </br>SD = 0.32  | Percentage of **REJ** errors for the same service at the destination |
 | [attack_type](#feature-attack_type) |  categorical, 23 different types | normal, neptune, warezclient, ipsweep, portsweep, teardrop, nmap, satan, smurf, pod, back, guess_passwd, ftp_write, multihop, rootkit, buffer_overflow, imap, warezmaster, phf, land, loadmodule, spy, perl |
-| difficulty_level |  22 different values in range 0-21 | - |
+| [difficulty_level](#feature-difficulty_level) |  22 different values in range 0-21 |  |
+
+# 3. Data description
+
+Short summary of some of the variables that are explored in more detail in the [eda notebook](../eda/eda.ipynb).
+
+Plots and descriptive statistics always refer to the training data set.
 
 ## Feature `attack_type`
 
 - This feature is used to create a binary target variable, because it identifies genuine vs malicious network traffic. 
 - In the training data set 53.46 % of cases are genuine network traffic. 
-- For display: Attack types with a proportion < 2% are summarized to 'other' category. 
+- For display: Attack types with < 2% occurence are summarized to 'other' category. 
 
-![Image: pie plot of attack types](../images/pie_plot_attack_types.png)
+    ![Image: pie plot of attack types](../images/pie_plot_attack_types.png)
 
-#  Background information 
+- Grouping attack types is by categories is another possibility that could be used for multiclass classification:
+    - Denial of Service (DoS)
+    - Scanning/Reconnaissance (Probe)
+    - Remote to local (R2L)
+    - User to Root Escalation (U2R)
+- For display: Categories with < 2 % occurences are summarized to 'other' category.
+
+    ![Image: pie plot of attack categories](../images/pie_plot_attack_categories.png)   
+
+## Feature `protocol_type`
+-   Overview of protocol types associated with malicious network traffic in the train data set (ranked by %).
+    -   When icmp is used as a protocol type 84% of the network traffic is malicious in the train data set. 
+    -   It is the most risky protocol type, although the total number of cases in the data set is relatively small (n = 8291).
+    -   This observation was used as a simple heuristc for a baseline model (`BM_protocol`) and discussed in [model comparison](../model/model_summary.md).
+
+    ![Image: bar plot of network traffic by protocol types](../images/barplot_traffic_by_protocol_type.png) 
+
+## Feature `flag`
+-   Overview of flags associated with malicious network traffic in the train data set (ranked by %):
+
+    ![Image: bar plot of network traffic by flags](../images/barplot_traffic_by_flag.png) 
+
+## Feature `difficulty_level`
+-   Overview of flags associated with malicious network traffic in the train data set (ranked by %)
+    -   With the highest difficulty level (21), the percentage of malicious network traffic is the lowest (21%).
+    -   With the lowest difficulty level (0), the percentage of malicious network traffic is the highest (100%).
+    - Between level 1 and 20 the relation is less clear.
+
+    ![Image: bar plot of network traffic by difficulty](../images/barplot_traffic_by_difficulty_level.png) 
+
+# 4. Background information 
 
 Some background knowledge and variables explained in more detail. 
 
