@@ -6,11 +6,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+# ---------------------------------------- define default parameters ----------------------------------
 # custom colors for palette
 COLOR_1 = 'steelblue'
 COLOR_2 =  '#E42A38'
 
 TARGET_LABELS = ["genuine", "malicious"]
+
+# headline parameters
+TITLE_STYLES = {
+    "main": {"fontsize": 12, "fontweight": "bold", "y": 0.92},
+    "sub": {"fontsize": 10, "fontweight": "normal", 'loc':'left', 'pad': 10},}
+# y -> vertical pos of title relative to fig: 0  bottom of fig, 1 top of fig
+# pad -> vertical space in point between title txt and axes
+# combine with plt.tight_layout(rect=[0, 0, 1, 0.95])  # to leave enogh space at to of fig (for titles)
+
 
 #  --------------------------------------- helper functions -----------------------------------------
 
@@ -62,14 +72,13 @@ def plot_to_pie(data_df, feature):
 
     # optimize title 
     category_name = pretty_category_str(feature)
-    # center title: use figure title (not axis title) for better centering
-    fig.suptitle(f"Different {category_name} in training data\n",
-                 fontsize=14, fontweight="normal", y=0.92)
+    # to center title use figure title (not axis title) 
+    fig.suptitle(f"Different {category_name} in training data", **TITLE_STYLES['main'])
 
     # equal aspect ratio ensures pie is drawn as circle
     ax.axis("equal")
 
-    plt.tight_layout()
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
     plt.show()
 
 # ---------------------------------------------- bar plots --------------------------------------------
@@ -117,11 +126,10 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     # optimize figure title 
     renamed_feature = pretty_category_str(feature)
     plt.suptitle(f"Frequency of network traffic by {renamed_feature}",
-                  fontsize=12, 
-                  fontweight="bold")
-    
-    # subtitle at figure-level 
-    plt.title("Ranked by malicious traffic percentage (%)", fontsize=11, loc="left", pad=10)
+                  **TITLE_STYLES["main"])
+    # add subtitle 
+    plt.title("Ranked by malicious traffic percentage (%)", 
+              **TITLE_STYLES["sub"])
 
     # optimize legend title and labels
     handles, labels = ax.get_legend_handles_labels()
@@ -151,7 +159,7 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     # set y-tick labels 
     ax.set_yticklabels(new_labels, va='center')
     
-    plt.tight_layout(rect=[0, 0, 1, 0.995])  # leave space between title and plot
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
     plt.show()
 
 
@@ -201,11 +209,10 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     # optimize figure title 
     renamed_feature = pretty_category_str(feature)
     plt.suptitle(f"Percent of malicious network traffic by {renamed_feature}",
-                  fontsize=12, 
-                  fontweight="bold")
-    
-    # subtitle at figure-level 
-    plt.title("Ranked by percentage descending (n total cases)", fontsize=11, loc="left", pad=10)
+                  ** TITLE_STYLES['main'])
+    # add subtitle 
+    plt.title("Ranked by percentage descending (n total cases)",
+               **TITLE_STYLES['sub'])
     
     # optimize y and x labels
     ax.set_ylabel(feature.replace("_", " ").capitalize())
@@ -232,7 +239,7 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     # set y-tick labels 
     ax.set_yticklabels(new_labels, va='center')
 
-    plt.tight_layout(rect=[0, 0, 1, 0.995])  # leave space between title and plot
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top fighure height free (for titles)
     plt.show()
 
 # --------------------------------------- aggregation functions ---------------------------------------
