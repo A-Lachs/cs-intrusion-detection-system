@@ -100,6 +100,7 @@ Plots and descriptive statistics always refer to the training data set.
 
     ![Image: pie plot of attack categories](../images/pie_plot_attack_categories.png)   
 
+
 ## Feature `protocol_type`
 -   Overview of protocol types associated with malicious network traffic in the train data set (ranked by %).
     -   When icmp is used as a protocol type 84% of the network traffic is malicious in the train data set. 
@@ -108,10 +109,23 @@ Plots and descriptive statistics always refer to the training data set.
 
     ![Image: bar plot of network traffic by protocol types](../images/barplot_traffic_by_protocol_type.png) 
 
+    ![Image: bar plot of percent malicious network traffic by protocol types](../images/barplot_traffic_by_protocol_type_percent.png) 
+
+
 ## Feature `flag`
 -   Overview of flags associated with malicious network traffic in the train data set (ranked by %):
 
     ![Image: bar plot of network traffic by flags](../images/barplot_traffic_by_flag.png) 
+
+    ![Image: bar plot percent of malicious network traffic by flags](../images/barplot_traffic_by_flag_percent.png) 
+
+## Feature `service`
+ - This feature has 70 categories that are plotted in full in the [eda notebook](../eda/eda.ipynb).
+ - For display only categories with less than 100% malicious network traffic are shown here.   
+
+    ![Image: bar plot percent of malicious network traffic by service](../images/barplot_traffic_by_service.png) 
+
+All remaining 44 categories are associtated with 100% malicious network traffic.
 
 ## Feature `difficulty_level`
 -   Overview of flags associated with malicious network traffic in the train data set (ranked by %)
@@ -120,6 +134,8 @@ Plots and descriptive statistics always refer to the training data set.
     - Between level 1 and 20 the relation is less clear.
 
     ![Image: bar plot of network traffic by difficulty](../images/barplot_traffic_by_difficulty_level.png) 
+
+    ![Image: bar plot of percent malicious network traffic by difficulty](../images/barplot_traffic_by_difficulty_level_percent.png) 
 
 # 4. Background information 
 
