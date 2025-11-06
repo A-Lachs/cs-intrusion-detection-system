@@ -35,7 +35,7 @@ Plots and descriptive statistics always refer to the training data set.
 | --- | ----------- |---|
 | duration | M = 287.14</br>SD = 2604.52 | Duration of the connection in seconds |
 | [protocol_type](#feature-protocol_type) | categorical, 3 types | Type of protocol ([TCP](#tcp---transmission-control-protocol), [UDP](#udp---user-datagram-protocol), [ICMP](#icmp---internet-control-message-protocol)) |
-| service |  categorical, 70 different services | Network service on the destination (http, ftp, smtp, ...)  |
+| [service](#feature-service) |  categorical, 70 different services | Network service on the destination (http, ftp, smtp, ...)  |
 | [flag](#feature-flag) |  categorical, 11 different flags | Status of connection</br>(SF, S0, REJ, RSTR, SH, RSTO, S1, RSTOS0, S3, S2, OTH)  |
 | src_bytes |  M = 0.05 MB</br> SD = 5.87 MB | Bytes sent from source to destination |
 | dst_bytes |  M = 0.02 MB</br> SD = 4.02 MB  | Bytes sent from destination to source |
@@ -113,7 +113,10 @@ Plots and descriptive statistics always refer to the training data set.
 
 
 ## Feature `flag`
--   Overview of flags associated with malicious network traffic in the train data set (ranked by %):
+-   Overview of flags associated with malicious network traffic in the train data set (ranked by %).
+    -   The most frequent flag is 'Sf' with 74945 cases and 15% malicious network traffic.
+    -   The second most frequent flag 'S0' has 34851 cases of which 99% are malicious network traffic. 
+    -   For the third most frequent flag 'Rej' 76% of 11233 cases in total are malicious network traffic. 
 
     ![Image: bar plot of network traffic by flags](../images/barplot_traffic_by_flag.png) 
 
@@ -121,14 +124,13 @@ Plots and descriptive statistics always refer to the training data set.
 
 ## Feature `service`
  - This feature has 70 categories that are plotted in full in the [eda notebook](../eda/eda.ipynb).
- - For display only categories with less than 100% malicious network traffic are shown here.   
+    -   As an overview only the 26 categories with less than 100% malicious network traffic are shown here. 
+    -   All remaining 44 categories are associtated with 100% malicious network traffic.
 
-    ![Image: bar plot percent of malicious network traffic by service](../images/barplot_traffic_by_service.png) 
-
-All remaining 44 categories are associtated with 100% malicious network traffic.
+    ![Image: bar plot percent of malicious network traffic by service](../images/barplot_traffic_by_service_percent.png) 
 
 ## Feature `difficulty_level`
--   Overview of flags associated with malicious network traffic in the train data set (ranked by %)
+-   Overview of difficulty levels associated with malicious network traffic in the train data set (ranked by %).
     -   With the highest difficulty level (21), the percentage of malicious network traffic is the lowest (21%).
     -   With the lowest difficulty level (0), the percentage of malicious network traffic is the highest (100%).
     - Between level 1 and 20 the relation is less clear.

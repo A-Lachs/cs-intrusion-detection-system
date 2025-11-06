@@ -133,7 +133,6 @@ Make predictions by running `predict.py` with 2 different modes (triggered by th
 - make evaluation output and description more specific (than printing the classification report)
 - improve automation: use kaggle API to get the data
 - eda: 
-    - Create eda summary (md file)
     - Clean the eda notebook (export the functions to the scripts folder for a better overview)
 - models:
     - add own precrocessing steps to pipeline
