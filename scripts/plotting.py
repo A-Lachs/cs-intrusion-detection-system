@@ -123,7 +123,7 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     
     Features: 
     - y-tick labels include the percentage of malicious network traffic for each category.
-    - Plot hight is increased if nr of catogories of inut feature > 15.
+    - Plot hight is increased with nr of catogories of inut feature.
     
     Args:
         data_df (pd.DataFrame): DF with count and percent of the feature categories grouped by target.
@@ -195,10 +195,13 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     plt.show()
 
 
-def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
+def barplot_percent_by_attack(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature:str, target:str):
     """
     Horizontal bar plot, plot percent of malicious network traffic by feature.
     The data_df has count and percent of the feature categories grouped by target.
+    The sub_df has count and percent of the feature categories grouped where target == 1 (malicious network traffic)
+    - Optional: The sub df can be further subset (e.g by percent) to plot only a portion of the data
+                (Useful when the feature has many categories). 
     
     Note:
     Use the helper function aggregate_feature_by_categories() to create this data_df, 
@@ -206,15 +209,16 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     
     Features:
     - y-tick labels include the number of total cases for each category.
-    - Plot hight is increased if nr of catogories of inut feature > 15.
+    - Plot hight is increased with nr of catogories of inut feature. 
     
     Args:
         data_df (pd.DataFrame): DF with count and percent of the feature categories grouped by target.
+        sub_df (pd.DataFrame):  part of data_df, expect: where target == 1 
         feature (str):          Name of categorical feature
         target (str):           Name of (binary) target feature
     """
 
-    category_oder = data_df[feature].unique() # keep category order of the input df for plotting
+    category_oder = sub_df[feature].unique() # keep category order of the sub df for plotting
     n_categories = len(category_oder)
     
     plot_width = 6
@@ -224,8 +228,6 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     plot_height = max(plot_height, n_categories* 0.2)
 
     plt.figure(figsize=(plot_width, plot_height))    
-
-    sub_df = data_df[(data_df[target] == 1)]    # only plot malicious network traffic
 
     # seaborn barblot
     ax = sns.barplot(
@@ -260,11 +262,11 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, feature:str, target:str):
     # set y-ticks 
     ax.set_yticks(range(len(category_oder))) # fixed pos for each category
     
-    # Compute total counts per category (sum over both attack=0 and attack=1)
+    # Compute total counts per category (sum over both attack=0 and attack=1) 
     total_counts = (
         data_df.groupby(feature, observed=False)['count']
         .sum()
-        .reindex(sub_df[feature].values)  # keep same order as plotted
+        .reindex(sub_df[feature].values)  # keep same order as plotted data
     )
     # create new labels 
     new_labels = [
