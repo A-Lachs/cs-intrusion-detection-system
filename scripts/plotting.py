@@ -26,10 +26,17 @@ def pretty_category_str(feature:str) -> str:
     """Returns a pretty string of input feature, capitalized and in plural.
        Used for plot titles.
     """
-    category_name = feature.replace("_", " ").capitalize()
+    category_name = feature.replace("_", " ")
     if category_name.endswith("y"):
         category_name = category_name[:-1] + "ie"
-    return category_name + "s"
+    elif "rerror" in category_name:
+        category_name = category_name.replace("rerror", "REJ error")
+    elif "serror" in category_name:
+        category_name = category_name.replace("serror", "SYN error")
+    
+    formatted_str = category_name[0].upper() + category_name[1:]  + "s"
+
+    return formatted_str
 
 
 def adjust_title_styles(n_categories: int):
@@ -111,7 +118,7 @@ def plot_to_pie(data_df, feature):
 
 # ---------------------------------------------- bar plots --------------------------------------------
 
-def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
+def barplot_frequency_by_target(data_df:pd.DataFrame, feature:str, target:str):
     """
     Horizontal bar plot, plot frequency of network traffic grouped by target (genuine vs malicious) 
     and a categorical feature.
@@ -195,7 +202,7 @@ def barplot_frequency_by_attack(data_df: pd.DataFrame, feature:str, target:str):
     plt.show()
 
 
-def barplot_percent_by_attack(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature:str, target:str):
+def barplot_percent_malicious(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature:str):
     """
     Horizontal bar plot, plot percent of malicious network traffic by feature.
     The data_df has count and percent of the feature categories grouped by target.
@@ -215,7 +222,6 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature
         data_df (pd.DataFrame): DF with count and percent of the feature categories grouped by target.
         sub_df (pd.DataFrame):  part of data_df, expect: where target == 1 
         feature (str):          Name of categorical feature
-        target (str):           Name of (binary) target feature
     """
 
     category_oder = sub_df[feature].unique() # keep category order of the sub df for plotting
@@ -278,6 +284,37 @@ def barplot_percent_by_attack(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature
 
     plt.tight_layout(rect=layout_rect)  # leave space at top of figure (for titles)
     plt.show()
+
+# ---------------------------------------- violin plots -----------------------------------------------
+
+def violinplot_by_target(data_df: pd.DataFrame, feature:str, target:str):
+    
+    # create figure and axes
+    fig, ax = plt.subplots(figsize=(5, 4))
+    
+    ax = sns.violinplot(
+                x=target, 
+                y=feature, 
+                data=data_df,
+                hue=target,
+                palette=[COLOR_1, COLOR_2])
+    
+    # change x axis ticks and label
+    ax.set_xticks([0, 1])  
+    ax.set_xticklabels(TARGET_LABELS)
+    ax.set_xlabel("Network traffic") 
+
+    # suppress legend
+    plt.legend([], [], frameon=False)
+    
+    # optimize title 
+    category_name = pretty_category_str(feature)
+    # to center title use figure title (not axis title) 
+    fig.suptitle(f"Distribution of {category_name}", **TITLE_STYLES['main'])
+
+    plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top figure height free (for titles)
+    plt.show()
+
 
 # --------------------------------------- aggregation functions ---------------------------------------
 
