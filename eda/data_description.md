@@ -58,13 +58,13 @@ Plots and descriptive statistics always refer to the training data set.
 | count |  M = 84.11 </br>SD = 114.51 | Nr of connections to **same host** as current connection in past 2s |
 | srv_count |   M = 27.74 </br>SD = 72.64 | Nr of connections to the **same service** as current connection in past 2s |
 | serror_rate |  M = 0.28 </br>SD = 0.45 | Percentage of connections with **SYN** errors |
-| srv_error_rate | M = 0.28 </br>SD = 0.45 | Percentage of connections with **SYN** errors for same service|
+| srv_serror_rate | M = 0.28 </br>SD = 0.45 | Percentage of connections with **SYN** errors for same service|
 | rerror_rate |  M = 0.12 </br>SD = 0.32| Percentage of connections with **REJ** errors |
 | srv_rerror_rate | M = 0.12 </br>SD = 0.32 | Percentage of connections with **REJ** errors for same service|
 | same_srv_rate |  M = 0.66 </br>SD = 0.44  | Percentage of connections to the same service|
 | diff_srv_rate |  M = 0.06 </br>SD = 0.18  | Percentage of connections to different services|
 | srv_diff_host_rate |  M = 0.10 </br>SD = 0.26 | Percentage of connections to different hosts|
-| dst_host_count |  M = 182.15 </br>SD = 99.21  | Count of destinations hosts accessed|
+| dst_host_count |  M = 182.15 </br>SD = 99.21  | Nr of destinations hosts accessed|
 | dst_host_srv_count |  M = 115.65 </br>SD = 110.70 | Count of connections to the same service at the destination|
 | dst_host_same_srv_rate |  M = 0.52 </br>SD = 0.45 | Percentage of connections to the **same service** at the destination|
 | dst_host_diff_srv_rate |  M = 0.08 </br>SD = 0.19  | Percentage of connections to **different services** at the destination|
