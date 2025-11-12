@@ -14,12 +14,20 @@ TOC_HEADER = "# Table of Contents"
 def slugify(text):
     """
     Convert a heading string into a clean, predictable identifier (slug) 
-    usable as anchor for links in jupyter notebooks.
+    usable as anchor for links in jupyter notebooks/VS code.
+    - Note: Keep numerical structure '2.1 Heading' by converting to '21-heading'. 
     """
     text = text.strip().lower()
-    text = re.sub(r"[^\w\s.-]", "", text)  # keep letters, numbers, spaces, and dots
-    text = re.sub(r"\s+", "-", text)       # spaces to hyphens
-    return text
+    #text = re.sub(r"[^\w\s.-]", "", text)  # keep letters, numbers, spaces, and dots
+    #text = re.sub(r"\s+", "-", text)       # spaces to hyphens
+    
+    text = re.sub(r"&[a-zA-Z0-9#]+;", "", text) # remove html entities
+    text = text.replace(".", "")                # drop all dots
+    text = re.sub(r"[^\w\s-]", "", text)        # remove all punctuation except spaces, hyphens, underscores
+    text = re.sub(r"\s+", "-", text)            # convert whitespace to hyphens
+    text = re.sub(r"-+", "-", text)             # collapse hyphens
+
+    return text.strip("-")
 
 def build_toc(nb):
     """
@@ -86,6 +94,7 @@ def main(path):
     #Write the modified notebook back to the same file
     nbformat.write(nb, path)
     print(f"TOC updated in {path}")
+
 
 if __name__ == "__main__":
 
