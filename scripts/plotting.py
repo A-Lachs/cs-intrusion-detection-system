@@ -285,10 +285,19 @@ def barplot_percent_malicious(data_df:pd.DataFrame, sub_df:pd.DataFrame, feature
     plt.tight_layout(rect=layout_rect)  # leave space at top of figure (for titles)
     plt.show()
 
-# ---------------------------------------- violin plots -----------------------------------------------
+# ---------------------------------------- numerical features -----------------------------------------------
+
 
 def violinplot_by_target(data_df: pd.DataFrame, feature:str, target:str):
-    
+    """
+    Plot the distribution of a numerical feature grouped by target
+    using seaborn violing plot. 
+
+    Args:
+        data_df (pd.DataFrame): Df that has the columns feature and target. 
+        feature (str): Name of column in data_df to plot. Expects numerical feature.
+        target (str): Name of column in data_df to group by. Expects (binary) categorical feature.
+    """
     # create figure and axes
     fig, ax = plt.subplots(figsize=(5, 4))
     
@@ -314,6 +323,52 @@ def violinplot_by_target(data_df: pd.DataFrame, feature:str, target:str):
 
     plt.tight_layout(rect=[0, 0, 1, 0.95])  # leave 5% of top figure height free (for titles)
     plt.show()
+
+
+def plot_correlation_heatmap(data_df:pd.DataFrame, fig_width=12, fig_heihgt=8) -> pd.DataFrame:
+    """
+    Compute correlations of numerical features (columns) in a DF and plot them as heatmap.
+    Seaborn heatmap plots rectangular data as color coded matrix.
+    Plot only the lower triangle by using a mask for the upper part.
+
+    Args:
+        data_df (pd.DataFrame): Df with numerical features.
+
+    Returns:
+        pd.DataFrame: Correlations of numerical features.
+    """
+    
+    # Compute correlations
+    correlations = data_df.corr() #  uses only numerical data
+   
+    # Generate a mask for the upper triangle
+    mask = np.zeros_like(correlations)
+    mask[np.triu_indices_from(mask)] = True
+
+    # Generate a custom diverging colormap
+    cmap = sns.diverging_palette(220, 10, as_cmap=True)
+
+    plt.figure(figsize=(fig_width, fig_heihgt))  
+    plt.suptitle("Correlations of numerical features",
+                  **TITLE_STYLES["main"],
+                 )
+
+    # Draw the heatmap with the mask
+    sns.heatmap(correlations, 
+                mask=mask, 
+                cmap=cmap,              # colormap
+                vmax=1,                 # anchor to colormap
+                annot=True,             # show values
+                fmt=".2f",              # format values
+                annot_kws={"size": 7}, 
+                linewidths=.5,          # cell lines
+                cbar_kws={"shrink": .7},
+                square=True,            # each cell is square shaped
+                )
+    
+    plt.show()
+
+    return correlations
 
 
 # --------------------------------------- aggregation functions ---------------------------------------
