@@ -12,8 +12,8 @@ Build a simple intrusion detection system (IDS) that classifies network traffic 
 -   Datasets were downloaded from **kaggle**, a description and overview of the data can be found [here](eda/data_description.md).
 
 -   Feature `attack type` was used to create a **target variable** for **binary classification**:
-    -   `0` --> genuine network traffic
-    -   `1` --> malicious network traffic 
+    -   `0` &rarr; genuine network traffic
+    -   `1` &rarr; malicious network traffic 
 
     ![Image: pie plot of attack types](images/pie_plot_attack_types.png)
 
@@ -22,9 +22,8 @@ Build a simple intrusion detection system (IDS) that classifies network traffic 
 
 ## Exploratory Data Analysis (EDA)
 
-- Performed extensive EDA to understand feature distributions and relationships
-- Selected and transformed features based on EDA insights to improve model performance
-- EDA work is documented in the [eda](eda/eda.ipynb) notebook
+- Performed extensive EDA to understand feature distributions and relationships, documented in the [eda](eda/eda.ipynb) notebook 
+- Selected and transformed features based on EDA insights to improve model performance &rarr; `features_for_preprocessing.json`
 
 ## Modeling & Evaluation
 
@@ -47,7 +46,7 @@ These models performed at or near chance level (~50% accuracy) on unseen data, p
 
 The primary model used was a Random Forest classifier, selected for its ability to handle heterogeneous feature types and capture non-linear relationships in network traffic data. 
 
-- Multiple Random Forest variants were trained and evaluated to assess model capacity and generalization behavior.
+- Multiple Random Forest variants were trained and evaluated 
 
 - The best-performing model was saved as: `model/random_forest_model.pkl` and can be loaded directly to make predictions on new data   
 
@@ -58,32 +57,22 @@ Baseline vs. Random Forest Performance (Test Data)
 
 | Model	| Accuracy	| Precision	| Recall|
 | --- | ----------- |---|---|
-|Baseline (best)	|~0.50	|high	|very low|
+|Baseline (best)	|0.58	|0.84	|0.12|
 |Random Forest (basic)	|0.81	|0.91	|0.74|
-|Random Forest (tuned)	|0.84	|0.92	|0.80|
+|Random Forest (best)	|0.84	|0.92	|0.80|
+
+</br>
 
 - Baseline models performed at or near chance level (~50% accuracy), highlighting the need for more complex models.
-
-- Random Forest models significantly outperformed baselines and generalized reasonably well to unseen data.
+- Random Forest models outperformed baselines and generalized reasonably well to unseen data.
 - The basic Random Forest showed signs of overfitting, performing much better on training than test data.
-- Hyperparameter tuning improved generalization and recall, which is critical for IDS applications.
-
-- The best-performing model achieved an accuracy of 84%, precision of 92%, and recall of 80% on the test set, clearly outperforming all baseline models. 
-
+- Hyperparameter tuning improved generalization and recall.
+- The best-performing model achieved an accuracy of 84%, precision of 92%, and recall of 80% on the test set.
 - Even the best model still misses some attacks, highlighting opportunities for further improvement.
-
-
-
+-   Model creation and evaluation is documented in the [model](model/model.ipynb) notebook. A summary and disusssion can be found [here](model/model_summary.md).  
 
 # Features
 
--  The kaggle [dataset](eda/data_description.md) NSL-KDD99 was used to train a random forest model to distinguish genuine from malicious network traffic (binary classification). 
-- On the basis of an exploratory data analysis (EDA) features were selected and transformed to improve model performance in the [eda](eda/eda.ipynb) notebook.
-- Different baseline models and random forest models were created and evaluated in the [model](model/model.ipynb) notebook. A summary and disusssion can be found [here](model/model_summary.md).  
-- The random forest model performance can be further improved by hyperparameter tuning, the current best model was saved as `model/random_forest_model.pkl` and can be loaded to make predictions. 
-- Make predictions about genuine or malicious network traffic by running `predict.py` (specifying model and input arguments as described below).
-
----
 - Train and evaluate multiple models for intrusion detection
 - Compare baseline models against a Random Forest classifier
 - Run predictions via a command-line interface
@@ -138,62 +127,55 @@ To avoid committing environment variables or datasets:
 
 Download the NSL-KDD99 dataset from [kaggle](https://www.kaggle.com/datasets/kaggleprollc/nsl-kdd99-dataset/data) and save in in the `data/` directory.
 
-- You **need the dataset** if you want to:
-    - Train models from scratch
-    - Run the notebooks for [eda](eda/eda.iypnb) and [modeling](model/model.ipynb) 
-    - Generate custom test input files from the kaggle data (described below)
-        - Create own test input files (optional):
-        - requires download of kaggle data set
-        - Create larger test input files from the kaggle test data set with the `create_test_input.py` script
-        - run `create_test_input.py nr_cases` where `nr_cases` is and integer that specifies the number of lines in the  
-        - Note: The maximum nr of cases is 22544.
-  
 - You **do not need the dataset** if you want to:
     - Run predictions using the provided models
     - Use the included test input files
     - Or provide your own input (in the same format as the test input)
     
+- You **need the dataset** if you want to:
+    - Train models from scratch
+    - Run the notebooks for [eda](eda/eda.iypnb) and [modeling](model/model.ipynb) 
+    - Generate custom test input files from the kaggle data set using the `create_test_input.py` script </br>&rarr; run `create_test_input.py nr_cases` from CLI, where `nr_cases` is and integer between 1 and 22544 (max number of cases in the test data set) 
+  
+
 
 ## 4.  Run predictions
 
 Predictions are made using `predict.py`, which supports two modes depending on the number of CLI arguments.
 
 ### Mode 1: Prediciton only 
-**Required arguments**
--   model name
--   X-values file (txt or csv)
 
-**Output**
-- `'prediction.txt'` containing one prediction per input row
+| Required arguments | Output |
+| --- | --- |
+| model name </br>X-values file (txt or csv)  |`prediction.txt` containing one prediction per input row |
 
 ### Mode 2: Prediction and evaluation
-**Required arguments**
--   model name 
--   X-values file 
--   corresponding y-values file
 
-**Output**
--    `'prediction.txt'`
--   printed  classification report 
+| Required arguments | Output |
+| --- | --- |
+| model name </br>X-values file </br>corresponding y-values file |`prediction.txt` </br>printed classification report|
+
 
 ---
 ### Available models
-- `'RF'` --> Random Forest Classifier (best)
-- `'BM_mal'` --> Baseline, always predicting malicious
-- `'BM_rand'` --> Baseline, random prediction
- - `'BM_protocol'` --> Baseline, predict malicious when protocol is 'imcp' 
+- `RF` &rarr; Random Forest Classifier (best)
+- `BM_mal` &rarr; Baseline, always predicting malicious
+- `BM_rand` &rarr; Baseline, random prediction
+- `BM_protocol` &rarr; Baseline, predict malicious when protocol is 'imcp' 
 ---
 
 ### Input Specifications
 ` X-values`
 - Must match feature format used for training
 - Example files created from test data set:
-    - `test_input_X_1.txt` ( 1 input case)
+    - `test_input_X_1.txt` (1 input case)
     - `test_input_X_20.txt` (20 input cases)  
         
 `y-values`
 - Required only for evaluation 
 - Number of labels must match the numer of X-values 
+    - `test_input_y_1.txt` (1 input case)
+    - `test_input_y_20.txt` (20 input cases)  
 
 ## 5. Example commands 
 
@@ -215,15 +197,19 @@ python predict.py RF test_input_X_20.txt test_input_y_20.txt
 ## 6. Interpreting results
 
 - Predictions are written to `prediction.txt`
-    - `0` → genuine traffic
-    - `1` → malicious traffic
+    - `0` &rarr; genuine traffic
+    - `1` &rarr; malicious traffic
 - When model evaluation is enabled, a classification report is printed to compare accuracy, precision, and recall (discussed [here](model/model_summary.md)).
 
 
 # Future improvements
 
--   Improve evaluation output and reporting
--   Automate dataset retrieval using the Kaggle API
+To keep the project within a reasonable timeframe, I intentionally limited further optimization of the Random Forest model. Additional iterations of the machine learning workflow (such as more extensive feature selection and engineering, refined preprocessing, and systematic hyperparameter tuning) could potentially yield improved performance.
+
+Beyond model optimization, several areas offer clear opportunities for future enhancement:
+
+-   Improve evaluation outputs and reporting for clearer model comparison and interpretability
+-   Automate dataset retrieval and updates using the Kaggle API
 -   Refactor EDA code into reusable scripts
--   Extend preprocessing steps within the modeling pipeline
--   Train and compare additional models (e.g. XGBoost)
+-   Extend preprocessing steps and integratem them within the modeling pipeline
+-   Train and compare additional models (e.g. XGBoost) to benchmark performance against the current approach
